@@ -1,0 +1,68 @@
+.block-strip {
+  grid-column: var(--col-start) / var(--col-end);
+  grid-row: var(--row);
+  background: var(--bg);
+  height: 20px;
+  margin: 26px 1px 2px;
+  align-self: start;
+  cursor: grab;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  transition: filter 0.1s, opacity 0.1s;
+  position: relative;
+  z-index: 3;
+  min-width: 0;
+}
+
+.block-strip:hover {
+  filter: brightness(1.08);
+}
+
+.block-strip:active,
+.block-strip--dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+.block-strip--round-left {
+  border-radius: 10px 0 0 10px;
+  margin-left: 3px;
+}
+
+.block-strip--round-right {
+  border-radius: 0 10px 10px 0;
+  margin-right: 3px;
+}
+
+.block-strip--round-left.block-strip--round-right {
+  border-radius: 10px;
+}
+
+/* Continuation arrows */
+.block-strip--arrow-left::before {
+  content: '◀';
+  font-size: 8px;
+  color: rgba(0,0,0,0.4);
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+
+.block-strip--arrow-right::after {
+  content: '▶';
+  font-size: 8px;
+  color: rgba(0,0,0,0.4);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.block-strip__label {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(0,0,0,0.65);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}

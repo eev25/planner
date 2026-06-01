@@ -1,0 +1,13 @@
+.block-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Height matches the day grid below it */
+  height: calc(var(--row-count, 6) * var(--cell-height, 72px));
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: repeat(var(--row-count, 6), var(--cell-height, 72px));
+  z-index: 2;
+}

@@ -1,0 +1,12 @@
+.drag-preview {
+  grid-column: var(--col-start) / var(--col-end);
+  grid-row: var(--row);
+  background: rgba(59, 130, 246, 0.25);
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  height: 20px;
+  margin: 26px 1px 2px;
+  align-self: start;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 2;
+}

@@ -1,0 +1,55 @@
+.day-cell {
+  min-height: 72px;
+  padding: 4px 6px;
+  border: 1px solid #e2e8f0;
+  box-sizing: border-box;
+  position: relative;
+  user-select: none;
+  cursor: crosshair;
+  background: #fff;
+  transition: background 0.1s;
+}
+
+.day-cell:hover {
+  background: #f8fafc;
+}
+
+.day-cell--today {
+  background: #eff6ff;
+}
+
+.day-cell--today .day-cell__number {
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.day-cell--dragging {
+  cursor: crosshair;
+}
+
+.day-cell--empty {
+  min-height: 72px;
+  border: 1px solid transparent;
+  pointer-events: none;
+  background: transparent;
+}
+
+.day-cell__number {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  position: relative;
+  z-index: 1;
+  line-height: 22px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

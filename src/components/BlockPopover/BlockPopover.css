@@ -1,0 +1,119 @@
+.popover-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.popover {
+  position: absolute;
+  width: 240px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+  padding: 14px;
+  z-index: 1001;
+  border: 1px solid #e2e8f0;
+}
+
+.popover__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.popover__close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  font-size: 14px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.popover__close:hover {
+  color: #475569;
+  background: #f1f5f9;
+}
+
+.popover__input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 13px;
+  outline: none;
+  margin-bottom: 12px;
+  color: #1e293b;
+  transition: border-color 0.15s;
+}
+
+.popover__input:focus {
+  border-color: #3b82f6;
+}
+
+.popover__colors {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--swatch-bg);
+  border: 2.5px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.color-swatch:hover {
+  transform: scale(1.15);
+}
+
+.color-swatch--selected {
+  border-color: #1e293b;
+  transform: scale(1.1);
+}
+
+.popover__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.popover__btn {
+  padding: 6px 14px;
+  border-radius: 7px;
+  border: none;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+
+.popover__btn--delete {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.popover__btn--delete:hover {
+  background: #fee2e2;
+}
+
+.popover__btn--save {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.popover__btn--save:hover {
+  background: #2563eb;
+}
