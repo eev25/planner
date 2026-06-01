@@ -16,7 +16,8 @@ export default function BlockLayer({ year, month, dayCellRef }) {
     if (!dayCellRef?.current || !layerRef.current) return;
     const layer = layerRef.current;
     const observer = new ResizeObserver(entries => {
-      const h = entries[0].contentRect.height;
+      const entry = entries[0];
+      const h = entry.borderBoxSize?.[0]?.blockSize ?? entry.target.getBoundingClientRect().height;
       if (h > 0) layer.style.setProperty('--cell-height', `${h}px`);
     });
     observer.observe(dayCellRef.current);
