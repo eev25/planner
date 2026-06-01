@@ -2,6 +2,7 @@ import { CalendarProvider } from './context/CalendarContext';
 import { useDrag } from './hooks/useDrag';
 import YearView from './components/YearView/YearView';
 import BlockPopover from './components/BlockPopover/BlockPopover';
+import EventList from './components/EventList/EventList';
 import './App.css';
 
 const YEAR = new Date().getFullYear();
@@ -14,7 +15,10 @@ function CalendarApp() {
         <h1 className="app-title">{YEAR}</h1>
         <p className="app-hint">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit &nbsp;·&nbsp; Right-click to delete</p>
       </header>
-      <YearView year={YEAR} />
+      <div className="app-content">
+        <YearView year={YEAR} />
+        <EventList />
+      </div>
       <BlockPopover />
     </>
   );

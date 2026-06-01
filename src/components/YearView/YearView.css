@@ -1,5 +1,6 @@
 .year-view {
   max-width: 900px;
-  margin: 0 auto;
   padding: 24px 24px 60px;
+  flex: 1;
+  min-width: 0;
 }

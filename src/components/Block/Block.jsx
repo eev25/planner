@@ -12,6 +12,7 @@ export default function Block({
 }) {
   const { dispatch, state } = useCalendar();
   const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
+  const isSelected = state.selectedBlockId === block.id;
 
   function onMouseDown(e) {
     if (e.button !== 0) return;
@@ -59,10 +60,12 @@ export default function Block({
     isClippedLeft  && strip.isFirstStrip ? 'block-strip--arrow-left'  : '',
     isClippedRight && strip.isLastStrip  ? 'block-strip--arrow-right' : '',
     isDragging ? 'block-strip--dragging' : '',
+    isSelected && !isDragging ? 'block-strip--selected' : '',
   ].filter(Boolean).join(' ');
 
   return (
     <div
+      data-block-id={block.id}
       className={classes}
       style={{
         '--col-start': strip.colStart + 1,

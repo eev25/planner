@@ -57,6 +57,13 @@
   flex-shrink: 0;
 }
 
+.block-strip--selected {
+  outline: 2px solid rgba(0, 0, 0, 0.55);
+  outline-offset: -1px;
+  filter: brightness(1.12);
+  z-index: 4;
+}
+
 .block-strip__label {
   font-size: 11px;
   font-weight: 600;

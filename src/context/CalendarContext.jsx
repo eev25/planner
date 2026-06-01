@@ -17,6 +17,7 @@ function loadBlocks() {
 
 const initialState = {
   blocks: loadBlocks(),
+  selectedBlockId: null,
   dragState: {
     mode: 'idle',
     anchorDate: null,
@@ -134,10 +135,17 @@ function reducer(state, action) {
         ),
       };
 
+    case 'SELECT_BLOCK':
+      return {
+        ...state,
+        selectedBlockId: state.selectedBlockId === action.id ? null : action.id,
+      };
+
     case 'BLOCK_DELETE':
       return {
         ...state,
         blocks: state.blocks.filter(b => b.id !== action.id),
+        selectedBlockId: state.selectedBlockId === action.id ? null : state.selectedBlockId,
         popover: state.popover.blockId === action.id ? initialState.popover : state.popover,
       };
 
