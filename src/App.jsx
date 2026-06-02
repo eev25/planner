@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CalendarProvider } from './context/CalendarContext';
 import { useDrag } from './hooks/useDrag';
 import YearView from './components/YearView/YearView';
@@ -24,10 +24,24 @@ function CalendarApp({ year, setYear }) {
     setIsEditing(false);
   }
 
+  const sentinelRef = useRef(null);
+  const [isSlim, setIsSlim] = useState(false);
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsSlim(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   useDrag(); // registers global mouse event listeners
   return (
     <>
-      <header className="app-header">
+      <header className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
         {isEditing ? (
           <input
             className="app-title app-title--editing"
@@ -69,6 +83,7 @@ function CalendarApp({ year, setYear }) {
         </div>
         <p className="app-hint">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit &nbsp;·&nbsp; Right-click to delete</p>
       </header>
+      <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
       <div className="app-content">
         <Minimap year={year} />
         <YearView year={year} />

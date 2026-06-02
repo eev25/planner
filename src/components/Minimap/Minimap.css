@@ -2,9 +2,9 @@
   width: 88px;
   flex-shrink: 0;
   position: sticky;
-  top: 24px;
+  top: 52px;
   align-self: flex-start;
-  height: calc(100vh - 48px);
+  height: calc(100vh - 76px);
   padding: 8px 6px 8px 8px;
   box-sizing: border-box;
 }
