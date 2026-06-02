@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { getDaysInMonth, getFirstDayOfWeek, toISO, formatMonthYear } from '../../utils/dateUtils';
+import { getDaysInMonth, getFirstDayOfWeek, toISO, formatMonth } from '../../utils/dateUtils';
 import DayCell from '../DayCell/DayCell';
 import BlockLayer from '../BlockLayer/BlockLayer';
 import './MonthGrid.css';
@@ -28,7 +28,7 @@ export default function MonthGrid({ year, month }) {
 
   return (
     <div className="month-grid" id={`month-${year}-${month}`}>
-      <h2 className="month-grid__title">{formatMonthYear(year, month)}</h2>
+      <h2 className="month-grid__title">{formatMonth(year, month)}</h2>
       <div className="month-grid__weekdays">
         {WEEKDAYS.map(d => <div key={d} className="month-grid__weekday">{d}</div>)}
       </div>

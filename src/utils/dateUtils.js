@@ -57,3 +57,7 @@ export function todayISO() {
 export function formatMonthYear(year, month) {
   return new Date(year, month, 1).toLocaleString('default', { month: 'long', year: 'numeric' });
 }
+
+export function formatMonth(year, month) {
+  return new Date(year, month, 1).toLocaleString('default', { month: 'long' });
+}
