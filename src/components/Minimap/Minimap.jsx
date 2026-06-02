@@ -94,7 +94,8 @@ export default function Minimap({ year }) {
     return rects;
   });
 
-  const svgDisplayHeight = window.innerHeight - 64; // minimap height (100vh-48) minus 16px padding
+  const minimapHeight = window.innerHeight - 76; // CSS: height: calc(100vh - 76px)
+  const svgDisplayHeight = minimapHeight - 16;   // minus 8px top + 8px bottom padding
 
   return (
     <div className="minimap">
