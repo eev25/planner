@@ -9,21 +9,8 @@ import './App.css';
 
 const BASE_YEAR = new Date().getFullYear();
 const MAX_YEAR = BASE_YEAR + 5;
-const TITLE_STORAGE_KEY = 'calendar-title';
 
 function CalendarApp({ year, setYear }) {
-  const [title, setTitle] = useState(
-    () => localStorage.getItem(TITLE_STORAGE_KEY) ?? String(BASE_YEAR)
-  );
-  const [isEditing, setIsEditing] = useState(false);
-
-  function commitTitle(value) {
-    const next = value.trim() || String(BASE_YEAR);
-    setTitle(next);
-    localStorage.setItem(TITLE_STORAGE_KEY, next);
-    setIsEditing(false);
-  }
-
   const sentinelRef = useRef(null);
   const [isSlim, setIsSlim] = useState(false);
 
@@ -42,26 +29,6 @@ function CalendarApp({ year, setYear }) {
   return (
     <>
       <header className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
-        {isEditing ? (
-          <input
-            className="app-title app-title--editing"
-            defaultValue={title}
-            autoFocus
-            onBlur={e => commitTitle(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') e.target.blur();
-              if (e.key === 'Escape') setIsEditing(false);
-            }}
-          />
-        ) : (
-          <h1
-            className="app-title app-title--clickable"
-            onClick={() => setIsEditing(true)}
-            title="Click to edit"
-          >
-            {title}
-          </h1>
-        )}
         <div className="year-selector">
           <button
             className="year-selector__btn"

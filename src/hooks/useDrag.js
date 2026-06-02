@@ -23,6 +23,8 @@ export function useDrag() {
         dispatch({ type: 'DRAG_COMMIT_CREATE' });
       } else if (dragState.mode === 'moving') {
         dispatch({ type: 'DRAG_COMMIT_MOVE' });
+      } else if (dragState.mode === 'resizing') {
+        dispatch({ type: 'DRAG_COMMIT_RESIZE' });
       }
     }
 

@@ -33,6 +33,16 @@ export default function Block({
     });
   }
 
+  function onResizeMouseDown(e, edge) {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    e.preventDefault();
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const dayEl = el?.closest('[data-date]') || el?.parentElement?.closest('[data-date]');
+    const clickedDate = dayEl?.dataset?.date || (edge === 'start' ? block.startDate : block.endDate);
+    dispatch({ type: 'DRAG_START_RESIZE', blockId: block.id, resizeEdge: edge, currentDate: clickedDate });
+  }
+
   function onContextMenu(e) {
     e.preventDefault();
     dispatch({ type: 'BLOCK_DELETE', id: block.id });
@@ -79,8 +89,20 @@ export default function Block({
       onClick={onClick}
       title={block.label || 'Click to edit, right-click to delete'}
     >
+      {strip.isFirstStrip && !isClippedLeft && (
+        <div
+          className="block-strip__resize-handle block-strip__resize-handle--left"
+          onMouseDown={e => onResizeMouseDown(e, 'start')}
+        />
+      )}
       {showLabel && block.label && (
         <span className="block-strip__label">{block.label}</span>
+      )}
+      {strip.isLastStrip && !isClippedRight && (
+        <div
+          className="block-strip__resize-handle block-strip__resize-handle--right"
+          onMouseDown={e => onResizeMouseDown(e, 'end')}
+        />
       )}
     </div>
   );

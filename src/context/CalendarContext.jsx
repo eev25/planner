@@ -24,6 +24,7 @@ const initialState = {
     currentDate: null,
     blockId: null,
     offsetDays: 0,
+    resizeEdge: null,
     previewStart: null,
     previewEnd: null,
   },
@@ -61,6 +62,25 @@ function reducer(state, action) {
           currentDate: action.currentDate,
           blockId: action.blockId,
           offsetDays: action.offsetDays,
+          resizeEdge: null,
+          previewStart: block.startDate,
+          previewEnd: block.endDate,
+        },
+      };
+    }
+
+    case 'DRAG_START_RESIZE': {
+      const block = state.blocks.find(b => b.id === action.blockId);
+      if (!block) return state;
+      return {
+        ...state,
+        dragState: {
+          mode: 'resizing',
+          anchorDate: null,
+          currentDate: action.currentDate,
+          blockId: action.blockId,
+          offsetDays: 0,
+          resizeEdge: action.resizeEdge,
           previewStart: block.startDate,
           previewEnd: block.endDate,
         },
@@ -92,6 +112,18 @@ function reducer(state, action) {
         };
       }
 
+      if (dragState.mode === 'resizing') {
+        const block = state.blocks.find(b => b.id === dragState.blockId);
+        if (!block) return state;
+        if (dragState.resizeEdge === 'start') {
+          const previewStart = minDate(action.currentDate, block.endDate);
+          return { ...state, dragState: { ...dragState, currentDate: action.currentDate, previewStart } };
+        } else {
+          const previewEnd = maxDate(action.currentDate, block.startDate);
+          return { ...state, dragState: { ...dragState, currentDate: action.currentDate, previewEnd } };
+        }
+      }
+
       return state;
     }
 
@@ -116,6 +148,17 @@ function reducer(state, action) {
     case 'DRAG_COMMIT_MOVE': {
       const { dragState } = state;
       if (dragState.mode !== 'moving') return state;
+      const blocks = state.blocks.map(b =>
+        b.id === dragState.blockId
+          ? { ...b, startDate: dragState.previewStart, endDate: dragState.previewEnd }
+          : b
+      );
+      return { ...state, blocks, dragState: { ...initialState.dragState } };
+    }
+
+    case 'DRAG_COMMIT_RESIZE': {
+      const { dragState } = state;
+      if (dragState.mode !== 'resizing') return state;
       const blocks = state.blocks.map(b =>
         b.id === dragState.blockId
           ? { ...b, startDate: dragState.previewStart, endDate: dragState.previewEnd }

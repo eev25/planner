@@ -30,10 +30,11 @@ export default function BlockLayer({ year, month, dayCellRef }) {
   // Collect all block strips for this month
   const blockStrips = [];
   for (const block of blocks) {
-    // During a move drag, use live preview position for the dragged block
-    const effectiveBlock = (dragState.mode === 'moving' && dragState.blockId === block.id)
-      ? { ...block, startDate: dragState.previewStart, endDate: dragState.previewEnd }
-      : block;
+    // During a move or resize drag, use live preview position for the dragged block
+    const effectiveBlock =
+      ((dragState.mode === 'moving' || dragState.mode === 'resizing') && dragState.blockId === block.id)
+        ? { ...block, startDate: dragState.previewStart, endDate: dragState.previewEnd }
+        : block;
 
     const segment = getBlockSegmentForMonth(effectiveBlock, year, month);
     if (!segment) continue;
@@ -68,7 +69,9 @@ export default function BlockLayer({ year, month, dayCellRef }) {
           strip={strip}
           isClippedLeft={segment.isClippedLeft}
           isClippedRight={segment.isClippedRight}
-          isDragging={dragState.mode === 'moving' && dragState.blockId === block.id}
+          isDragging={
+            (dragState.mode === 'moving' || dragState.mode === 'resizing') && dragState.blockId === block.id
+          }
         />
       ))}
       {previewStrips.map((strip, i) => (
