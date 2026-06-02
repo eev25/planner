@@ -1,14 +1,17 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { useCalendar } from '../context/CalendarContext';
 
 export function useDrag() {
   const { state, dispatch } = useCalendar();
   const { dragState } = state;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (dragState.mode === 'idle') return;
 
+    let hasMoved = false;
+
     function onMouseMove(e) {
+      hasMoved = true;
       // Walk up from point to find a [data-date] element
       const el = document.elementFromPoint(e.clientX, e.clientY);
       const dayEl = el?.closest('[data-date]');
@@ -22,7 +25,21 @@ export function useDrag() {
       if (dragState.mode === 'creating') {
         dispatch({ type: 'DRAG_COMMIT_CREATE' });
       } else if (dragState.mode === 'moving') {
-        dispatch({ type: 'DRAG_COMMIT_MOVE' });
+        if (!hasMoved) {
+          // No movement — treat as a click; open the popover editor
+          const blockEl = document.querySelector(`[data-block-id="${dragState.blockId}"]`);
+          const rect = blockEl?.getBoundingClientRect();
+          dispatch({ type: 'DRAG_CANCEL' });
+          if (rect) {
+            dispatch({
+              type: 'POPOVER_OPEN',
+              blockId: dragState.blockId,
+              anchorRect: { top: rect.top, left: rect.left, bottom: rect.bottom, right: rect.right, width: rect.width, height: rect.height },
+            });
+          }
+        } else {
+          dispatch({ type: 'DRAG_COMMIT_MOVE' });
+        }
       } else if (dragState.mode === 'resizing') {
         dispatch({ type: 'DRAG_COMMIT_RESIZE' });
       }
@@ -42,5 +59,5 @@ export function useDrag() {
       window.removeEventListener('mouseup', onMouseUp);
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, [dragState.mode, dispatch]);
+  }, [dragState.mode, dispatch, dragState.blockId]);
 }
