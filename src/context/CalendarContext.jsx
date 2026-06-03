@@ -195,7 +195,7 @@ function reducer(state, action) {
     case 'POPOVER_OPEN':
       return {
         ...state,
-        popover: { visible: true, blockId: action.blockId, anchorRect: action.anchorRect || null },
+        popover: { visible: true, blockId: action.blockId, anchorRect: action.anchorRect || null, clickPoint: action.clickPoint || null },
       };
 
     case 'POPOVER_CLOSE':

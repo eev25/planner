@@ -21,7 +21,7 @@ export function useDrag() {
       // If no dayEl found, keep last known position (no snap-to-nothing)
     }
 
-    function onMouseUp() {
+    function onMouseUp(e) {
       if (dragState.mode === 'creating') {
         dispatch({ type: 'DRAG_COMMIT_CREATE' });
       } else if (dragState.mode === 'moving') {
@@ -35,6 +35,7 @@ export function useDrag() {
               type: 'POPOVER_OPEN',
               blockId: dragState.blockId,
               anchorRect: { top: rect.top, left: rect.left, bottom: rect.bottom, right: rect.right, width: rect.width, height: rect.height },
+              clickPoint: { x: e.clientX, y: e.clientY },
             });
           }
         } else {

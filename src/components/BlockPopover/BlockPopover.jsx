@@ -42,16 +42,25 @@ export default function BlockPopover() {
   }
 
   const style = {};
-  if (popover.anchorRect) {
+  if (popover.clickPoint) {
+    const { x, y } = popover.clickPoint;
+    const spaceBelow = window.innerHeight - y;
+    if (spaceBelow > 180) {
+      style.top  = y + 8;
+      style.left = Math.min(x, window.innerWidth - 260);
+    } else {
+      style.top  = Math.max(8, y - 188);
+      style.left = Math.min(x, window.innerWidth - 260);
+    }
+  } else if (popover.anchorRect) {
     const r = popover.anchorRect;
-    // Position below the block; flip up if near bottom
     const spaceBelow = window.innerHeight - r.bottom;
     if (spaceBelow > 180) {
-      style.top  = r.bottom + window.scrollY + 8;
-      style.left = Math.min(r.left + window.scrollX, window.innerWidth - 260);
+      style.top  = r.bottom + 8;
+      style.left = Math.min(r.left, window.innerWidth - 260);
     } else {
-      style.top  = r.top + window.scrollY - 180;
-      style.left = Math.min(r.left + window.scrollX, window.innerWidth - 260);
+      style.top  = Math.max(8, r.top - 188);
+      style.left = Math.min(r.left, window.innerWidth - 260);
     }
   } else {
     style.top  = '50%';
