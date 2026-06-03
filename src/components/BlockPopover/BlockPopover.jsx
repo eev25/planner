@@ -69,8 +69,8 @@ export default function BlockPopover() {
   }
 
   return createPortal(
-    <div className="popover-overlay" onMouseDown={onOverlayClick}>
-      <div className="popover" style={style} onMouseDown={e => e.stopPropagation()}>
+    <div className="popover-overlay" onPointerDown={onOverlayClick}>
+      <div className="popover" style={style} onPointerDown={e => e.stopPropagation()}>
         <div className="popover__header">
           <span>Edit block</span>
           <button className="popover__close" onClick={() => dispatch({ type: 'POPOVER_CLOSE' })}>✕</button>

@@ -117,3 +117,12 @@
 .popover__btn--save:hover {
   background: #2563eb;
 }
+
+@media (max-width: 768px) {
+  .popover {
+    width: calc(100vw - 32px);
+    max-width: 320px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}

@@ -8,6 +8,7 @@
   cursor: crosshair;
   background: #fff;
   transition: background 0.1s;
+  touch-action: pan-y;
 }
 
 .day-cell:hover {

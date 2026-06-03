@@ -10,7 +10,7 @@ export function useDrag() {
 
     let hasMoved = false;
 
-    function onMouseMove(e) {
+    function onPointerMove(e) {
       hasMoved = true;
       // Walk up from point to find a [data-date] element
       const el = document.elementFromPoint(e.clientX, e.clientY);
@@ -21,7 +21,7 @@ export function useDrag() {
       // If no dayEl found, keep last known position (no snap-to-nothing)
     }
 
-    function onMouseUp(e) {
+    function onPointerUp(e) {
       if (dragState.mode === 'creating') {
         dispatch({ type: 'DRAG_COMMIT_CREATE' });
       } else if (dragState.mode === 'moving') {
@@ -46,18 +46,24 @@ export function useDrag() {
       }
     }
 
+    function onPointerCancel() {
+      dispatch({ type: 'DRAG_CANCEL' });
+    }
+
     function onKeyDown(e) {
       if (e.key === 'Escape') {
         dispatch({ type: 'DRAG_CANCEL' });
       }
     }
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseup', onMouseUp);
+    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointerup', onPointerUp);
+    window.addEventListener('pointercancel', onPointerCancel);
     window.addEventListener('keydown', onKeyDown);
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('pointerup', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerCancel);
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [dragState.mode, dispatch, dragState.blockId]);

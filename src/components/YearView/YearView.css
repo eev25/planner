@@ -4,3 +4,10 @@
   flex: 1;
   min-width: 0;
 }
+
+@media (max-width: 768px) {
+  .year-view {
+    padding: 12px 8px 40px;
+    max-width: 100%;
+  }
+}

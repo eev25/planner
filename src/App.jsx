@@ -13,6 +13,8 @@ const MAX_YEAR = BASE_YEAR + 5;
 function CalendarApp({ year, setYear }) {
   const sentinelRef = useRef(null);
   const [isSlim, setIsSlim] = useState(false);
+  const [isMinimapOpen, setIsMinimapOpen] = useState(false);
+  const [isEventListOpen, setIsEventListOpen] = useState(false);
 
   useEffect(() => {
     const el = sentinelRef.current;
@@ -29,6 +31,14 @@ function CalendarApp({ year, setYear }) {
   return (
     <>
       <header className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
+        <button
+          className="minimap-toggle"
+          onClick={() => setIsMinimapOpen(o => !o)}
+          aria-label="Toggle map panel"
+          aria-expanded={isMinimapOpen}
+        >
+          Map
+        </button>
         <div className="year-selector">
           <button
             className="year-selector__btn"
@@ -48,13 +58,22 @@ function CalendarApp({ year, setYear }) {
             →
           </button>
         </div>
-        <p className="app-hint">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit</p>
+        <button
+          className="event-list-toggle"
+          onClick={() => setIsEventListOpen(o => !o)}
+          aria-label="Toggle events panel"
+          aria-expanded={isEventListOpen}
+        >
+          Events
+        </button>
+        <p className="app-hint app-hint--desktop">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit</p>
+        <p className="app-hint app-hint--mobile">Drag to create &nbsp;·&nbsp; Tap to edit</p>
       </header>
       <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
       <div className="app-content">
-        <Minimap year={year} />
+        <Minimap year={year} isOpen={isMinimapOpen} onClose={() => setIsMinimapOpen(false)} />
         <YearView year={year} />
-        <EventList />
+        <EventList isOpen={isEventListOpen} onClose={() => setIsEventListOpen(false)} />
       </div>
       <BlockPopover />
     </>

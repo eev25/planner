@@ -14,7 +14,7 @@ export default function Block({
   const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
   const isSelected = state.selectedBlockId === block.id;
 
-  function onMouseDown(e) {
+  function onPointerDown(e) {
     if (e.button !== 0) return;
     e.stopPropagation();
     e.preventDefault();
@@ -33,7 +33,7 @@ export default function Block({
     });
   }
 
-  function onResizeMouseDown(e, edge) {
+  function onResizePointerDown(e, edge) {
     if (e.button !== 0) return;
     e.stopPropagation();
     e.preventDefault();
@@ -68,13 +68,13 @@ export default function Block({
         '--bg':        colorDef.bg,
         '--light':     colorDef.light,
       }}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
       title={block.label || 'Click to edit'}
     >
       {strip.isFirstStrip && !isClippedLeft && (
         <div
           className="block-strip__resize-handle block-strip__resize-handle--left"
-          onMouseDown={e => onResizeMouseDown(e, 'start')}
+          onPointerDown={e => onResizePointerDown(e, 'start')}
         />
       )}
       {showLabel && block.label && (
@@ -83,7 +83,7 @@ export default function Block({
       {strip.isLastStrip && !isClippedRight && (
         <div
           className="block-strip__resize-handle block-strip__resize-handle--right"
-          onMouseDown={e => onResizeMouseDown(e, 'end')}
+          onPointerDown={e => onResizePointerDown(e, 'end')}
         />
       )}
     </div>

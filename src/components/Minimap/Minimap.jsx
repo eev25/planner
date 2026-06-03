@@ -36,15 +36,23 @@ function measureLayout(year) {
   return { calendarOffset, calendarHeight, monthData };
 }
 
-export default function Minimap({ year }) {
+export default function Minimap({ year, isOpen, onClose }) {
   const { state: { blocks } } = useCalendar();
   const [vpY, setVpY] = useState(0);
   const [layout, setLayout] = useState(null);
+  const [measuredSvgHeight, setMeasuredSvgHeight] = useState(null);
+  const [svgBodyOffset, setSvgBodyOffset] = useState(0);
   const svgRef = useRef(null);
 
   useLayoutEffect(() => {
     setLayout(measureLayout(year));
   }, [year]);
+
+  useLayoutEffect(() => {
+    if (!svgRef.current || !layout) return;
+    setMeasuredSvgHeight(svgRef.current.getBoundingClientRect().height);
+    setSvgBodyOffset(svgRef.current.offsetTop);
+  }, [layout]);
 
   useEffect(() => {
     const onResize = () => setLayout(measureLayout(year));
@@ -73,7 +81,7 @@ export default function Minimap({ year }) {
     window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
   };
 
-  if (!layout) return <div className="minimap" />;
+  if (!layout) return <div className={`minimap${isOpen ? ' minimap--open' : ''}`} />;
 
   const { calendarHeight, monthData } = layout;
 
@@ -102,53 +110,64 @@ export default function Minimap({ year }) {
   });
 
   const minimapHeight = window.innerHeight - 76; // CSS: height: calc(100vh - 76px)
-  const svgDisplayHeight = minimapHeight - 16;   // minus 8px top + 8px bottom padding
+  const svgDisplayHeight = measuredSvgHeight ?? (minimapHeight - 16);
   const svgRx = 6 * SVG_WIDTH / SVG_DISPLAY_WIDTH;
   const svgRy = 6 * calendarHeight / svgDisplayHeight;
 
   return (
-    <div className="minimap">
-      {monthData.map((m, i) => (
-        <span
-          key={i}
-          className="minimap__label"
-          style={{ top: 8 + (m.offset / calendarHeight) * svgDisplayHeight }}
-        >
-          {MONTH_NAMES[i]}
-        </span>
-      ))}
-      <svg
-        ref={svgRef}
-        className="minimap__svg"
-        viewBox={`0 0 ${SVG_WIDTH} ${calendarHeight}`}
-        preserveAspectRatio="none"
-        onClick={handleClick}
-      >
-        {/* Month separator lines */}
-        {monthData.map((m, i) => i > 0 && (
-          <line
-            key={i}
-            x1={0} y1={m.offset} x2={SVG_WIDTH} y2={m.offset}
-            stroke="#e2e8f0" strokeWidth={4}
-          />
-        ))}
+    <>
+      {isOpen && (
+        <div className="minimap__backdrop" onClick={onClose} aria-hidden="true" />
+      )}
+      <div className={`minimap${isOpen ? ' minimap--open' : ''}`}>
+        <div className="minimap__header">
+          <h2 className="minimap__title">Map</h2>
+          <button className="minimap__close" onClick={onClose} aria-label="Close map panel">✕</button>
+        </div>
+        <div className="minimap__body">
+          {monthData.map((m, i) => (
+            <span
+              key={i}
+              className="minimap__label"
+              style={{ top: svgBodyOffset + (m.offset / calendarHeight) * svgDisplayHeight }}
+            >
+              {MONTH_NAMES[i]}
+            </span>
+          ))}
+          <svg
+            ref={svgRef}
+            className="minimap__svg"
+            viewBox={`0 0 ${SVG_WIDTH} ${calendarHeight}`}
+            preserveAspectRatio="none"
+            onClick={handleClick}
+          >
+            {/* Month separator lines */}
+            {monthData.map((m, i) => i > 0 && (
+              <line
+                key={i}
+                x1={0} y1={m.offset} x2={SVG_WIDTH} y2={m.offset}
+                stroke="#e2e8f0" strokeWidth={4}
+              />
+            ))}
 
-        {/* Blocks */}
-        {blockRects}
+            {/* Blocks */}
+            {blockRects}
 
-        {/* Viewport indicator */}
-        <rect
-          x={0}
-          y={Math.max(0, vpY)}
-          width={SVG_WIDTH}
-          height={window.innerHeight}
-          fill="rgba(59,130,246,0.06)"
-          stroke="rgba(59,130,246,0.35)"
-          strokeWidth={8}
-          rx={svgRx} ry={svgRy}
-          style={{ pointerEvents: 'none' }}
-        />
-      </svg>
-    </div>
+            {/* Viewport indicator */}
+            <rect
+              x={0}
+              y={Math.max(0, vpY)}
+              width={SVG_WIDTH}
+              height={window.innerHeight}
+              fill="rgba(59,130,246,0.06)"
+              stroke="rgba(59,130,246,0.35)"
+              strokeWidth={8}
+              rx={svgRx} ry={svgRy}
+              style={{ pointerEvents: 'none' }}
+            />
+          </svg>
+        </div>
+      </div>
+    </>
   );
 }

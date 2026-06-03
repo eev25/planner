@@ -10,3 +10,10 @@
   pointer-events: none;
   z-index: 2;
 }
+
+@media (max-width: 768px) {
+  .drag-preview {
+    height: 28px;
+    margin-top: 22px;
+  }
+}

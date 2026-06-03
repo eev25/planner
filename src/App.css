@@ -101,3 +101,57 @@
   max-width: 1160px;
   margin: 0 auto;
 }
+
+/* Mobile: toggle buttons hidden on desktop, mobile hint hidden on desktop */
+.minimap-toggle     { display: none; }
+.event-list-toggle  { display: none; }
+.app-hint--mobile   { display: none; }
+
+@media (max-width: 768px) {
+  .app-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    gap: 8px;
+  }
+
+  .app-header--slim {
+    padding: 8px 16px;
+  }
+
+  .app-content {
+    max-width: 100%;
+  }
+
+  .minimap-toggle,
+  .event-list-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1.5px solid #e2e8f0;
+    background: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+  }
+
+  .minimap-toggle:hover,
+  .event-list-toggle:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+  }
+
+  .app-hint--desktop { display: none; }
+  .app-hint--mobile  { display: block; font-size: 12px; width: 100%; text-align: center; }
+
+  .year-selector {
+    margin: 0;
+  }
+}

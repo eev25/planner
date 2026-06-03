@@ -12,7 +12,7 @@ function durationLabel(startISO, endISO) {
   return days > 1 ? `${days} days` : null;
 }
 
-export default function EventList() {
+export default function EventList({ isOpen, onClose }) {
   const { state, dispatch, year } = useCalendar();
   const { blocks, selectedBlockId } = state;
 
@@ -35,15 +35,27 @@ export default function EventList() {
       document.querySelector(`[data-block-id="${blockId}"]`)
         ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     });
+    if (onClose) onClose();
   }
 
   return (
-    <aside className="event-list">
+    <>
+      {isOpen && (
+        <div className="event-list__backdrop" onClick={onClose} aria-hidden="true" />
+      )}
+      <aside className={`event-list${isOpen ? ' event-list--open' : ''}`}>
       <div className="event-list__header">
         <h2 className="event-list__title">Events</h2>
         {yearBlocks.length > 0 && (
           <span className="event-list__count">{yearBlocks.length}</span>
         )}
+        <button
+          className="event-list__close"
+          onClick={onClose}
+          aria-label="Close events panel"
+        >
+          ✕
+        </button>
       </div>
       {activeMonths.length === 0 ? (
         <p className="event-list__empty">No events yet. Drag on the calendar to create one.</p>
@@ -85,6 +97,7 @@ export default function EventList() {
           ))}
         </div>
       )}
-    </aside>
+      </aside>
+    </>
   );
 }

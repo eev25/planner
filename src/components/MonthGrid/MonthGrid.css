@@ -34,3 +34,16 @@
   display: grid;
   grid-template-columns: repeat(7, 1fr);
 }
+
+@media (max-width: 768px) {
+  .month-grid {
+    margin-bottom: 24px;
+  }
+  .month-grid__title {
+    font-size: 15px;
+  }
+  .month-grid__weekday {
+    font-size: 10px;
+    letter-spacing: 0.02em;
+  }
+}

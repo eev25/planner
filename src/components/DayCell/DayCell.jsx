@@ -14,7 +14,7 @@ const DayCell = forwardRef(function DayCell({ dateISO, dayNumber, isEmpty }, ref
     return <div className="day-cell day-cell--empty" ref={ref} />;
   }
 
-  function onMouseDown(e) {
+  function onPointerDown(e) {
     if (e.button !== 0) return;
     e.preventDefault();
     dispatch({ type: 'DRAG_START_CREATE', anchorDate: dateISO });
@@ -25,7 +25,7 @@ const DayCell = forwardRef(function DayCell({ dateISO, dayNumber, isEmpty }, ref
       ref={ref}
       className={`day-cell${isToday ? ' day-cell--today' : ''}${isDragging ? ' day-cell--dragging' : ''}`}
       data-date={dateISO}
-      onMouseDown={onMouseDown}
+      onPointerDown={onPointerDown}
     >
       <span className="day-cell__number">{dayNumber}</span>
     </div>
