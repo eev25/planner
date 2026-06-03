@@ -82,27 +82,7 @@
   width: 8px;
   cursor: col-resize;
   z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.15s;
 }
 
 .block-strip__resize-handle--left  { left: 0; }
 .block-strip__resize-handle--right { right: 0; }
-
-.block-strip__resize-handle::after {
-  content: '';
-  display: block;
-  width: 2px;
-  height: 10px;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 1px;
-  box-shadow: 2px 0 0 rgba(0,0,0,0.35), -2px 0 0 rgba(0,0,0,0.35);
-}
-
-.block-strip:hover .block-strip__resize-handle,
-.block-strip--dragging .block-strip__resize-handle {
-  opacity: 1;
-}
