@@ -5,6 +5,7 @@ import { COLORS } from '../../utils/colorPalette';
 import './Minimap.css';
 
 const SVG_WIDTH = 700; // 7 columns × 100 units each
+const SVG_DISPLAY_WIDTH = 74; // minimap width (88px) − left padding (8px) − right padding (6px)
 const CELL_HEIGHT = 72;
 const BLOCK_TOP_MARGIN = 26;
 const BLOCK_HEIGHT = 20;
@@ -37,7 +38,7 @@ function measureLayout(year) {
 
 export default function Minimap({ year }) {
   const { state: { blocks } } = useCalendar();
-  const [scrollY, setScrollY] = useState(() => window.scrollY);
+  const [vpY, setVpY] = useState(0);
   const [layout, setLayout] = useState(null);
   const svgRef = useRef(null);
 
@@ -52,23 +53,29 @@ export default function Minimap({ year }) {
   }, [year]);
 
   useEffect(() => {
-    const onScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const update = () => {
+      const el = document.querySelector('.year-view');
+      if (el) setVpY(-el.getBoundingClientRect().top);
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
   }, []);
 
   const handleClick = (e) => {
     if (!layout || !svgRef.current) return;
+    const yearEl = document.querySelector('.year-view');
+    if (!yearEl) return;
     const { top, height } = svgRef.current.getBoundingClientRect();
     const fraction = (e.clientY - top) / height;
-    const targetY = layout.calendarOffset + fraction * layout.calendarHeight - window.innerHeight / 2;
+    const calOff = yearEl.getBoundingClientRect().top + window.scrollY;
+    const targetY = calOff + fraction * layout.calendarHeight - window.innerHeight / 2;
     window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
   };
 
   if (!layout) return <div className="minimap" />;
 
-  const { calendarOffset, calendarHeight, monthData } = layout;
-  const vpY = scrollY - calendarOffset;
+  const { calendarHeight, monthData } = layout;
 
   const blockRects = blocks.flatMap(block => {
     const rects = [];
@@ -96,6 +103,8 @@ export default function Minimap({ year }) {
 
   const minimapHeight = window.innerHeight - 76; // CSS: height: calc(100vh - 76px)
   const svgDisplayHeight = minimapHeight - 16;   // minus 8px top + 8px bottom padding
+  const svgRx = 6 * SVG_WIDTH / SVG_DISPLAY_WIDTH;
+  const svgRy = 6 * calendarHeight / svgDisplayHeight;
 
   return (
     <div className="minimap">
@@ -136,7 +145,7 @@ export default function Minimap({ year }) {
           fill="rgba(59,130,246,0.06)"
           stroke="rgba(59,130,246,0.35)"
           strokeWidth={8}
-          rx={4}
+          rx={svgRx} ry={svgRy}
           style={{ pointerEvents: 'none' }}
         />
       </svg>
