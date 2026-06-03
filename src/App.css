@@ -120,6 +120,21 @@
 
   .app-header--slim {
     padding: 8px 16px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    justify-items: center;
+  }
+
+  .app-header--slim .minimap-toggle {
+    justify-self: start;
+  }
+
+  .app-header--slim .event-list-toggle {
+    justify-self: end;
+  }
+
+  .app-header--slim .app-hint--mobile {
+    display: none;
   }
 
   .app-content {

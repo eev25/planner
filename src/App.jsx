@@ -51,7 +51,7 @@ function CalendarApp({ year, setYear }) {
       <header ref={headerRef} className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
         <button
           className="minimap-toggle"
-          onClick={() => setIsMinimapOpen(o => !o)}
+          onClick={() => { setIsMinimapOpen(o => !o); setIsEventListOpen(false); }}
           aria-label="Toggle map panel"
           aria-expanded={isMinimapOpen}
         >
@@ -78,7 +78,7 @@ function CalendarApp({ year, setYear }) {
         </div>
         <button
           className="event-list-toggle"
-          onClick={() => setIsEventListOpen(o => !o)}
+          onClick={() => { setIsEventListOpen(o => !o); setIsMinimapOpen(false); }}
           aria-label="Toggle events panel"
           aria-expanded={isEventListOpen}
         >
