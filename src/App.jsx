@@ -48,7 +48,7 @@ function CalendarApp({ year, setYear }) {
             →
           </button>
         </div>
-        <p className="app-hint">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit &nbsp;·&nbsp; Right-click to delete</p>
+        <p className="app-hint">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit</p>
       </header>
       <div ref={sentinelRef} style={{ height: 1 }} aria-hidden="true" />
       <div className="app-content">

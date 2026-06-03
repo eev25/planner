@@ -43,11 +43,6 @@ export default function Block({
     dispatch({ type: 'DRAG_START_RESIZE', blockId: block.id, resizeEdge: edge, currentDate: clickedDate });
   }
 
-  function onContextMenu(e) {
-    e.preventDefault();
-    dispatch({ type: 'BLOCK_DELETE', id: block.id });
-  }
-
   const showLabel = strip.isFirstStrip && !isClippedLeft;
   const roundLeft  = strip.isFirstStrip && !isClippedLeft;
   const roundRight = strip.isLastStrip  && !isClippedRight;
@@ -74,8 +69,7 @@ export default function Block({
         '--light':     colorDef.light,
       }}
       onMouseDown={onMouseDown}
-      onContextMenu={onContextMenu}
-      title={block.label || 'Click to edit, right-click to delete'}
+      title={block.label || 'Click to edit'}
     >
       {strip.isFirstStrip && !isClippedLeft && (
         <div
