@@ -50,8 +50,11 @@ export default function Minimap({ year, isOpen, onClose }) {
 
   useLayoutEffect(() => {
     if (!svgRef.current || !layout) return;
-    setMeasuredSvgHeight(svgRef.current.getBoundingClientRect().height);
-    setSvgBodyOffset(svgRef.current.offsetTop);
+    const bodyEl = svgRef.current.parentElement;
+    const svgRect = svgRef.current.getBoundingClientRect();
+    const bodyRect = bodyEl.getBoundingClientRect();
+    setMeasuredSvgHeight(svgRect.height);
+    setSvgBodyOffset(svgRect.top - bodyRect.top);
   }, [layout]);
 
   useEffect(() => {
@@ -109,7 +112,8 @@ export default function Minimap({ year, isOpen, onClose }) {
     return rects;
   });
 
-  const minimapHeight = window.innerHeight - 76; // CSS: height: calc(100vh - 76px)
+  const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 52;
+  const minimapHeight = window.innerHeight - headerH - 24;
   const svgDisplayHeight = measuredSvgHeight ?? (minimapHeight - 16);
   const svgRx = 6 * SVG_WIDTH / SVG_DISPLAY_WIDTH;
   const svgRy = 6 * calendarHeight / svgDisplayHeight;
@@ -120,10 +124,6 @@ export default function Minimap({ year, isOpen, onClose }) {
         <div className="minimap__backdrop" onClick={onClose} aria-hidden="true" />
       )}
       <div className={`minimap${isOpen ? ' minimap--open' : ''}`}>
-        <div className="minimap__header">
-          <h2 className="minimap__title">Map</h2>
-          <button className="minimap__close" onClick={onClose} aria-label="Close map panel">✕</button>
-        </div>
         <div className="minimap__body">
           {monthData.map((m, i) => (
             <span

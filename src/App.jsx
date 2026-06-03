@@ -12,6 +12,7 @@ const MAX_YEAR = BASE_YEAR + 5;
 
 function CalendarApp({ year, setYear }) {
   const sentinelRef = useRef(null);
+  const headerRef = useRef(null);
   const [isSlim, setIsSlim] = useState(false);
   const [isMinimapOpen, setIsMinimapOpen] = useState(false);
   const [isEventListOpen, setIsEventListOpen] = useState(false);
@@ -27,10 +28,27 @@ function CalendarApp({ year, setYear }) {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    const header = headerRef.current;
+    if (!header) return;
+    const update = () => {
+      const h = header.getBoundingClientRect().height;
+      document.documentElement.style.setProperty('--header-height', `${h}px`);
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(header);
+    header.addEventListener('transitionend', update);
+    return () => {
+      ro.disconnect();
+      header.removeEventListener('transitionend', update);
+    };
+  }, []);
+
   useDrag(); // registers global mouse event listeners
   return (
     <>
-      <header className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
+      <header ref={headerRef} className={`app-header${isSlim ? ' app-header--slim' : ''}`}>
         <button
           className="minimap-toggle"
           onClick={() => setIsMinimapOpen(o => !o)}

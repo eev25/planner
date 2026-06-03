@@ -9,39 +9,6 @@
   box-sizing: border-box;
 }
 
-/* Desktop: header and close button hidden */
-.minimap__header {
-  display: none;
-}
-
-.minimap__title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f172a;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0;
-}
-
-.minimap__close {
-  display: none;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #94a3b8;
-  font-size: 16px;
-  padding: 4px 6px;
-  border-radius: 4px;
-  line-height: 1;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.minimap__close:hover {
-  color: #475569;
-  background: #f1f5f9;
-}
 
 /* Desktop: body fills full height; position: relative ancestor for labels */
 .minimap__body {
@@ -82,15 +49,15 @@
 @media (max-width: 768px) {
   .minimap {
     position: fixed;
-    top: 0;
+    top: var(--header-height, 52px);
     left: 0;
     bottom: 0;
-    width: min(280px, 85vw);
-    height: 100vh;
-    max-height: 100vh;
+    width: 88px;
+    height: calc(100vh - var(--header-height, 52px));
+    max-height: calc(100vh - var(--header-height, 52px));
     z-index: 200;
     transform: translateX(-100%);
-    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), top 0.2s ease, height 0.2s ease;
     background: #fff;
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
     border-right: 1px solid #e2e8f0;
@@ -104,20 +71,7 @@
     transform: translateX(0);
   }
 
-  .minimap__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 20px 16px 16px;
-    border-bottom: 1px solid #e2e8f0;
-    flex-shrink: 0;
-  }
-
-  .minimap__close {
-    display: flex;
-  }
-
-  .minimap__body {
+.minimap__body {
     flex: 1;
     padding: 8px 6px 8px 8px;
     overflow: hidden;
@@ -126,8 +80,12 @@
   .minimap__backdrop {
     display: block;
     position: fixed;
-    inset: 0;
+    top: var(--header-height, 52px);
+    right: 0;
+    bottom: 0;
+    left: 0;
     background: rgba(0, 0, 0, 0.3);
     z-index: 199;
+    transition: top 0.2s ease;
   }
 }
