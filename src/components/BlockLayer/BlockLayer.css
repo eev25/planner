@@ -3,11 +3,32 @@
   top: 0;
   left: 0;
   right: 0;
-  /* Height matches the day grid below it */
-  height: calc(var(--row-count, 6) * var(--cell-height, 72px));
+  height: calc(var(--row-count, 6) * var(--cell-height, 84px));
   pointer-events: none;
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: repeat(var(--row-count, 6), var(--cell-height, 72px));
+  grid-template-rows: repeat(var(--row-count, 6), var(--cell-height, 84px));
   z-index: 2;
+}
+
+.overflow-badge {
+  grid-column: var(--col-start) / var(--col-end);
+  grid-row: var(--row);
+  height: 16px;
+  margin-top: 62px; /* lane-2 position: 26px + 2 * 18px */
+  align-self: start;
+  pointer-events: none;
+  font-size: 10px;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  z-index: 3;
+}
+
+@media (max-width: 768px) {
+  .overflow-badge {
+    margin-top: 58px; /* lane-2 position: 22px + 2 * 18px */
+  }
 }

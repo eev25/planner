@@ -6,9 +6,9 @@ import './Minimap.css';
 
 const SVG_WIDTH = 700; // 7 columns × 100 units each
 const SVG_DISPLAY_WIDTH = 74; // minimap width (88px) − left padding (8px) − right padding (6px)
-const CELL_HEIGHT = 72;
+const CELL_HEIGHT = 84;
 const BLOCK_TOP_MARGIN = 26;
-const BLOCK_HEIGHT = 20;
+const BLOCK_HEIGHT = 16;
 const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function measureLayout(year) {

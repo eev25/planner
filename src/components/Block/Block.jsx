@@ -9,6 +9,7 @@ export default function Block({
   isClippedLeft,
   isClippedRight,
   isDragging,
+  lane = 0,
 }) {
   const { dispatch, state } = useCalendar();
   const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
@@ -65,6 +66,7 @@ export default function Block({
         '--col-start': strip.colStart + 1,
         '--col-end':   strip.colEnd + 2,
         '--row':       strip.row + 1,
+        '--lane':      lane,
         '--bg':        colorDef.bg,
         '--light':     colorDef.light,
       }}

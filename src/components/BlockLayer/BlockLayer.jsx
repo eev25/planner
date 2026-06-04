@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
-import { getBlockSegmentForMonth, getStripsForSegment, getMonthRowCount } from '../../utils/blockUtils';
+import { computeLaneStrips, getBlockSegmentForMonth, getStripsForSegment, getMonthRowCount } from '../../utils/blockUtils';
 import Block from '../Block/Block';
 import DragPreview from '../DragPreview/DragPreview';
 import './BlockLayer.css';
@@ -27,23 +27,14 @@ export default function BlockLayer({ year, month, dayCellRef }) {
     return () => observer.disconnect();
   }, [dayCellRef]);
 
-  // Collect all block strips for this month
-  const blockStrips = [];
-  for (const block of blocks) {
-    // During a move or resize drag, use live preview position for the dragged block
-    const effectiveBlock =
-      ((dragState.mode === 'moving' || dragState.mode === 'resizing') && dragState.blockId === block.id)
-        ? { ...block, startDate: dragState.previewStart, endDate: dragState.previewEnd }
-        : block;
+  // Apply drag preview position to the dragged block, then compute lane-aware strips
+  const effectiveBlocks = blocks.map(block =>
+    ((dragState.mode === 'moving' || dragState.mode === 'resizing') && dragState.blockId === block.id)
+      ? { ...block, startDate: dragState.previewStart, endDate: dragState.previewEnd }
+      : block
+  );
 
-    const segment = getBlockSegmentForMonth(effectiveBlock, year, month);
-    if (!segment) continue;
-
-    const strips = getStripsForSegment(segment.segmentStart, segment.segmentEnd, year, month);
-    for (const strip of strips) {
-      blockStrips.push({ block, segment, strip });
-    }
-  }
+  const { laneStrips, overflowBadges } = computeLaneStrips(effectiveBlocks, year, month);
 
   // Drag preview strips
   const previewStrips = [];
@@ -62,17 +53,27 @@ export default function BlockLayer({ year, month, dayCellRef }) {
       className="block-layer"
       style={{ '--row-count': rowCount }}
     >
-      {blockStrips.map(({ block, segment, strip }) => (
+      {laneStrips.map(({ block, strip, lane, isClippedLeft, isClippedRight }) => (
         <Block
-          key={`${block.id}-r${strip.row}-c${strip.colStart}`}
+          key={`${block.id}-r${strip.row}-c${strip.colStart}-l${lane}`}
           block={block}
           strip={strip}
-          isClippedLeft={segment.isClippedLeft}
-          isClippedRight={segment.isClippedRight}
+          lane={lane}
+          isClippedLeft={isClippedLeft}
+          isClippedRight={isClippedRight}
           isDragging={
             (dragState.mode === 'moving' || dragState.mode === 'resizing') && dragState.blockId === block.id
           }
         />
+      ))}
+      {overflowBadges.map(({ row, col, count }) => (
+        <div
+          key={`overflow-${row}-${col}`}
+          className="overflow-badge"
+          style={{ '--col-start': col + 1, '--col-end': col + 2, '--row': row + 1 }}
+        >
+          +{count}
+        </div>
       ))}
       {previewStrips.map((strip, i) => (
         <DragPreview key={i} strip={strip} />

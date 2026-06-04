@@ -1,5 +1,5 @@
 .day-cell {
-  min-height: 72px;
+  min-height: 84px;
   padding: 4px 6px;
   border: 1px solid #e2e8f0;
   box-sizing: border-box;
@@ -35,7 +35,7 @@
 }
 
 .day-cell--empty {
-  min-height: 72px;
+  min-height: 84px;
   border: 1px solid transparent;
   pointer-events: none;
   background: transparent;
