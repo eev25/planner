@@ -71,6 +71,18 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Sticky pins at the panel's padding edge; this masks the strip above it so
+   scrolled content doesn't show through. */
+.event-list__year::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -20px;
+  height: 20px;
+  background: #fff;
+}
+
 .event-list__month {
   font-size: 11px;
   font-weight: 700;

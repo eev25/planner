@@ -10,7 +10,7 @@ const CELL_HEIGHT = 84;
 const BLOCK_TOP_MARGIN = 26;
 const BLOCK_HEIGHT = 16;
 const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const YEAR_LABEL_OFFSET = 12; // pushes the JAN label below the year label above it
+const YEAR_LABEL_OFFSET = 16; // pushes the JAN label below the year label above it
 
 // All offsets are relative to the top of .year-view, so they don't change on scroll.
 function measureLayout(range) {
