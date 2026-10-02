@@ -5,6 +5,7 @@ import YearView from './components/YearView/YearView';
 import BlockPopover from './components/BlockPopover/BlockPopover';
 import EventList from './components/EventList/EventList';
 import Minimap from './components/Minimap/Minimap';
+import DataTransfer from './components/DataTransfer/DataTransfer';
 import { measureSlimHeaderHeight, scrollToElement } from './utils/scrollUtils';
 import './App.css';
 
@@ -149,14 +150,17 @@ function CalendarApp() {
             →
           </button>
         </div>
-        <button
-          className="event-list-toggle"
-          onClick={() => { setIsEventListOpen(o => !o); setIsMinimapOpen(false); }}
-          aria-label="Toggle events panel"
-          aria-expanded={isEventListOpen}
-        >
-          Events
-        </button>
+        <div className="header-actions">
+          <button
+            className="event-list-toggle"
+            onClick={() => { setIsEventListOpen(o => !o); setIsMinimapOpen(false); }}
+            aria-label="Toggle events panel"
+            aria-expanded={isEventListOpen}
+          >
+            Events
+          </button>
+          <DataTransfer />
+        </div>
         <p className="app-hint app-hint--desktop">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit</p>
         <p className="app-hint app-hint--mobile">Drag to create &nbsp;·&nbsp; Tap to edit</p>
       </header>

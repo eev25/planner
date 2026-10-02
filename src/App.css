@@ -96,6 +96,22 @@
 }
 
 /* Mobile: toggle buttons hidden on desktop, mobile hint hidden on desktop */
+/* Desktop: pinned to the right edge so the year selector stays centered and the
+   header height is unchanged. Mobile overrides this to sit in the third grid cell. */
+.header-actions {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-header--slim .header-actions {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 .minimap-toggle     { display: none; }
 .event-list-toggle  { display: none; }
 .app-hint--mobile   { display: none; }
@@ -122,7 +138,14 @@
     justify-self: start;
   }
 
-  .app-header--slim .event-list-toggle {
+  .header-actions,
+  .app-header--slim .header-actions {
+    position: static;
+    transform: none;
+    gap: 6px;
+  }
+
+  .app-header--slim .header-actions {
     justify-self: end;
   }
 

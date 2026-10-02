@@ -192,6 +192,14 @@ function reducer(state, action) {
         popover: state.popover.blockId === action.id ? initialState.popover : state.popover,
       };
 
+    case 'BLOCKS_IMPORT':
+      return {
+        ...state,
+        blocks: action.blocks,
+        selectedBlockId: action.blocks.some(b => b.id === state.selectedBlockId) ? state.selectedBlockId : null,
+        popover: { ...initialState.popover },
+      };
+
     case 'POPOVER_OPEN':
       return {
         ...state,
