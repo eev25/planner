@@ -1,0 +1,20 @@
+/* Below the minimap/event-list panels (z 199-200) and the import dialog (z 100) */
+.today-button {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 20px;
+  background: #3b82f6;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+  transition: background 0.15s;
+}
+
+.today-button:hover { background: #2563eb; }

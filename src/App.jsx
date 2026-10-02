@@ -6,6 +6,7 @@ import BlockPopover from './components/BlockPopover/BlockPopover';
 import EventList from './components/EventList/EventList';
 import Minimap from './components/Minimap/Minimap';
 import DataTransfer from './components/DataTransfer/DataTransfer';
+import TodayButton from './components/TodayButton/TodayButton';
 import { measureSlimHeaderHeight, scrollToElement } from './utils/scrollUtils';
 import './App.css';
 
@@ -119,6 +120,13 @@ function CalendarApp() {
     ensureYear(year, () => scrollToElement(document.getElementById(`year-${year}`), 'smooth'));
   };
 
+  // Same landing spot as first load: the current month.
+  const jumpToToday = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    ensureYear(year, () => scrollToElement(document.getElementById(`month-${year}-${now.getMonth()}`), 'smooth'));
+  };
+
   useDrag(); // registers global mouse event listeners
   return (
     <>
@@ -176,6 +184,7 @@ function CalendarApp() {
         />
         <EventList isOpen={isEventListOpen} onClose={() => setIsEventListOpen(false)} ensureYear={ensureYear} />
       </div>
+      <TodayButton onClick={jumpToToday} />
       <BlockPopover />
     </>
   );
