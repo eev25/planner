@@ -14,6 +14,7 @@
 .minimap__body {
   position: relative;
   height: 100%;
+  overflow: hidden; /* labels slide out at the map's edges */
 }
 
 .minimap__svg {
