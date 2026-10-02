@@ -15,6 +15,29 @@ const TOAST_MS = 4000;
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
+// Arrow into a tray = save the file to disk (export); arrow out of it = load one (import).
+function TrayIcon({ arrow }) {
+  return (
+    <svg
+      className="data-transfer__icon"
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M2.5 10.5v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" />
+      {arrow === 'down'
+        ? <path d="M8 2.5v7M5 6.8l3 3 3-3" />
+        : <path d="M8 9.5v-7M5 5.2l3-3 3 3" />}
+    </svg>
+  );
+}
+
 export default function DataTransfer() {
   const { state, dispatch } = useCalendar();
   const fileInputRef = useRef(null);
@@ -91,8 +114,7 @@ export default function DataTransfer() {
         aria-label="Export events"
         title="Export events"
       >
-        <span className="data-transfer__icon" aria-hidden="true">↓</span>
-        <span className="data-transfer__text">Export</span>
+        <TrayIcon arrow="down" />
       </button>
       <button
         className="data-transfer__btn"
@@ -100,8 +122,7 @@ export default function DataTransfer() {
         aria-label="Import events"
         title="Import events"
       >
-        <span className="data-transfer__icon" aria-hidden="true">↑</span>
-        <span className="data-transfer__text">Import</span>
+        <TrayIcon arrow="up" />
       </button>
       <input
         ref={fileInputRef}
