@@ -39,15 +39,9 @@
   color: #94a3b8;
   letter-spacing: 0.05em;
   line-height: 1;
+  transform: translateY(5px); /* gap between the separator line and the label's top */
   pointer-events: none;
   user-select: none;
-}
-
-.minimap__label--year {
-  transform: translateY(calc(-100% - 3px)); /* sit above the separator line */
-  color: #0f172a;
-  font-size: 13px;
-  font-weight: 800;
 }
 
 .minimap__backdrop {

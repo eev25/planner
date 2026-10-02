@@ -176,16 +176,6 @@ export default function Minimap({ range, isOpen, onClose }) {
       )}
       <div className={`minimap${isOpen ? ' minimap--open' : ''}`}>
         <div className="minimap__body">
-          {/* Year labels sit just above the heavier January separator; JAN sits below it */}
-          {layout.months.filter(m => m.month === 0 && inWindow(m.offset)).map(m => (
-            <span
-              key={`year-${m.year}`}
-              className="minimap__label minimap__label--year"
-              style={{ top: labelTop(m.offset) }}
-            >
-              {m.year}
-            </span>
-          ))}
           {layout.months.filter(m => inWindow(m.offset)).map(m => (
             <span
               key={`${m.year}-${m.month}`}
