@@ -33,13 +33,6 @@
   gap: 8px;
 }
 
-.app-header--slim .year-selector__btn {
-  max-width: 0;
-  opacity: 0;
-  padding: 0;
-  pointer-events: none;
-}
-
 .app-header--slim .year-selector__label {
   font-size: 15px;
 }
