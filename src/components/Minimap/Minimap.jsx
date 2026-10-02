@@ -10,7 +10,6 @@ const CELL_HEIGHT = 84;
 const BLOCK_TOP_MARGIN = 26;
 const BLOCK_HEIGHT = 16;
 const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-const YEAR_LABEL_OFFSET = 16; // pushes the JAN label below the year label above it
 
 // All offsets are relative to the top of .year-view, so they don't change on scroll.
 function measureLayout(range) {
@@ -149,20 +148,21 @@ export default function Minimap({ range, isOpen, onClose }) {
       )}
       <div className={`minimap${isOpen ? ' minimap--open' : ''}`}>
         <div className="minimap__body">
-          {layout.years.filter(y => inWindow(y.offset)).map(y => (
+          {/* Year labels sit just above the heavier January separator; JAN sits below it */}
+          {layout.months.filter(m => m.month === 0 && inWindow(m.offset)).map(m => (
             <span
-              key={`year-${y.year}`}
+              key={`year-${m.year}`}
               className="minimap__label minimap__label--year"
-              style={{ top: labelTop(y.offset) }}
+              style={{ top: labelTop(m.offset) }}
             >
-              {y.year}
+              {m.year}
             </span>
           ))}
           {layout.months.filter(m => inWindow(m.offset)).map(m => (
             <span
               key={`${m.year}-${m.month}`}
               className="minimap__label"
-              style={{ top: labelTop(m.offset) + (m.month === 0 ? YEAR_LABEL_OFFSET : 0) }}
+              style={{ top: labelTop(m.offset) }}
             >
               {MONTH_NAMES[m.month]}
             </span>

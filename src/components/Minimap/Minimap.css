@@ -43,6 +43,7 @@
 }
 
 .minimap__label--year {
+  transform: translateY(calc(-100% - 3px)); /* sit above the separator line */
   color: #0f172a;
   font-size: 13px;
   font-weight: 800;
