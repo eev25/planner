@@ -10,14 +10,13 @@
   background: #fff;
   border-left: 1px solid #e2e8f0;
   scrollbar-width: thin;
-  transition: top 0.2s ease, height 0.2s ease;
 }
 
 .event-list__header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 20px; /* at least the year heading's mask height, or the mask clips the title */
 }
 
 .event-list__title {
@@ -205,7 +204,7 @@
     max-height: none;
     z-index: 200;
     transform: translateX(100%);
-    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), top 0.2s ease, height 0.2s ease;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     border-left: 1px solid #e2e8f0;
     box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
   }
@@ -227,6 +226,5 @@
     left: 0;
     background: rgba(0, 0, 0, 0.3);
     z-index: 199;
-    transition: top 0.2s ease;
   }
 }
