@@ -3,8 +3,12 @@ import { COLORS } from '../../utils/colorPalette';
 import { fromISO, daysBetween } from '../../utils/dateUtils';
 import './EventList.css';
 
-function formatDate(iso) {
-  return fromISO(iso).toLocaleDateString('default', { month: 'short', day: 'numeric' });
+function formatDate(iso, withYear = false) {
+  return fromISO(iso).toLocaleDateString('default', {
+    month: 'short',
+    day: 'numeric',
+    ...(withYear && { year: 'numeric' }),
+  });
 }
 
 function durationLabel(startISO, endISO) {
@@ -12,28 +16,40 @@ function durationLabel(startISO, endISO) {
   return days > 1 ? `${days} days` : null;
 }
 
-export default function EventList({ isOpen, onClose }) {
-  const { state, dispatch, year } = useCalendar();
+export default function EventList({ isOpen, onClose, ensureYear }) {
+  const { state, dispatch } = useCalendar();
   const { blocks, selectedBlockId } = state;
 
-  const yearBlocks = [...blocks]
-    .filter(b => b.startDate.startsWith(String(year)))
-    .sort((a, b) => a.startDate.localeCompare(b.startDate));
+  // Group by start year, then start month. A block that crosses a year boundary
+  // is listed once, under the year it starts in.
+  const years = [];
+  for (const block of [...blocks].sort((a, b) => a.startDate.localeCompare(b.startDate))) {
+    const year = Number(block.startDate.slice(0, 4));
+    const month = Number(block.startDate.slice(5, 7)) - 1;
+    let yearGroup = years.at(-1);
+    if (yearGroup?.year !== year) {
+      yearGroup = { year, months: [] };
+      years.push(yearGroup);
+    }
+    let monthGroup = yearGroup.months.at(-1);
+    if (monthGroup?.month !== month) {
+      monthGroup = {
+        month,
+        name: new Date(year, month, 1).toLocaleString('default', { month: 'long' }),
+        events: [],
+      };
+      yearGroup.months.push(monthGroup);
+    }
+    monthGroup.events.push(block);
+  }
 
-  const activeMonths = Array.from({ length: 12 }, (_, m) => {
-    const prefix = `${year}-${String(m + 1).padStart(2, '0')}`;
-    return {
-      month: m,
-      name: new Date(year, m, 1).toLocaleString('default', { month: 'long' }),
-      events: yearBlocks.filter(b => b.startDate.startsWith(prefix)),
-    };
-  }).filter(m => m.events.length > 0);
-
-  function handleSelect(blockId) {
-    dispatch({ type: 'SELECT_BLOCK', id: blockId });
-    requestAnimationFrame(() => {
-      document.querySelector(`[data-block-id="${blockId}"]`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  function handleSelect(block) {
+    dispatch({ type: 'SELECT_BLOCK', id: block.id });
+    ensureYear(Number(block.startDate.slice(0, 4)), () => {
+      requestAnimationFrame(() => {
+        document.querySelector(`[data-block-id="${block.id}"]`)
+          ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
     });
     if (onClose) onClose();
   }
@@ -46,8 +62,8 @@ export default function EventList({ isOpen, onClose }) {
       <aside className={`event-list${isOpen ? ' event-list--open' : ''}`}>
       <div className="event-list__header">
         <h2 className="event-list__title">Events</h2>
-        {yearBlocks.length > 0 && (
-          <span className="event-list__count">{yearBlocks.length}</span>
+        {blocks.length > 0 && (
+          <span className="event-list__count">{blocks.length}</span>
         )}
         <button
           className="event-list__close"
@@ -57,23 +73,27 @@ export default function EventList({ isOpen, onClose }) {
           ✕
         </button>
       </div>
-      {activeMonths.length === 0 ? (
+      {years.length === 0 ? (
         <p className="event-list__empty">No events yet. Drag on the calendar to create one.</p>
       ) : (
         <div className="event-list__groups">
-          {activeMonths.map(({ month, name, events }) => (
+          {years.map(({ year, months }) => (
+            <div key={year} className="event-list__year-group">
+              <h3 className="event-list__year">{year}</h3>
+              {months.map(({ month, name, events }) => (
             <div key={month} className="event-list__group">
-              <h3 className="event-list__month">{name}</h3>
+              <h4 className="event-list__month">{name}</h4>
               <ul className="event-list__items">
                 {events.map(block => {
                   const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
                   const duration = durationLabel(block.startDate, block.endDate);
                   const isSelected = block.id === selectedBlockId;
+                  const crossesYear = block.startDate.slice(0, 4) !== block.endDate.slice(0, 4);
                   return (
                     <li
                       key={block.id}
                       className={`event-list__item${isSelected ? ' event-list__item--selected' : ''}`}
-                      onClick={() => handleSelect(block.id)}
+                      onClick={() => handleSelect(block)}
                     >
                       <span
                         className="event-list__dot"
@@ -84,8 +104,8 @@ export default function EventList({ isOpen, onClose }) {
                           {block.label || <em className="event-list__unlabeled">Unlabeled</em>}
                         </span>
                         <span className="event-list__dates">
-                          {formatDate(block.startDate)}
-                          {block.startDate !== block.endDate && ` – ${formatDate(block.endDate)}`}
+                          {formatDate(block.startDate, crossesYear)}
+                          {block.startDate !== block.endDate && ` – ${formatDate(block.endDate, crossesYear)}`}
                           {duration && <span className="event-list__duration">{duration}</span>}
                         </span>
                       </div>
@@ -93,6 +113,8 @@ export default function EventList({ isOpen, onClose }) {
                   );
                 })}
               </ul>
+            </div>
+              ))}
             </div>
           ))}
         </div>

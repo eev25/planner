@@ -51,6 +51,26 @@
   gap: 20px;
 }
 
+.event-list__year-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.event-list__year {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 6px 0;
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 13px;
+  font-weight: 800;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
 .event-list__month {
   font-size: 11px;
   font-weight: 700;

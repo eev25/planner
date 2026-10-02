@@ -1,13 +1,45 @@
 .year-view {
+  position: relative; /* sentinels and year offsets are relative to this */
   max-width: 900px;
   padding: 24px 24px 60px;
   flex: 1;
   min-width: 0;
 }
 
+.year-view__sentinel {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}
+
+.year-view__sentinel--top    { top: 0; }
+.year-view__sentinel--bottom { bottom: 0; }
+
+.year-section + .year-section {
+  border-top: 2px solid #e2e8f0;
+  margin-top: 8px;
+  padding-top: 24px;
+}
+
+.year-section__heading {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin: 0 0 16px;
+  padding: 0 4px;
+}
+
 @media (max-width: 768px) {
   .year-view {
     padding: 12px 8px 40px;
     max-width: 100%;
+  }
+
+  .year-section__heading {
+    font-size: 22px;
   }
 }

@@ -170,3 +170,9 @@
     margin: 0;
   }
 }
+
+/* Used while measuring the slim header height without animating */
+.app-header--measuring,
+.app-header--measuring * {
+  transition: none !important;
+}

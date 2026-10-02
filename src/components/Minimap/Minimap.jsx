@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useLayoutEffect } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, useMemo } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
 import { getBlockSegmentForMonth, getStripsForSegment } from '../../utils/blockUtils';
 import { COLORS } from '../../utils/colorPalette';
@@ -10,33 +10,42 @@ const CELL_HEIGHT = 84;
 const BLOCK_TOP_MARGIN = 26;
 const BLOCK_HEIGHT = 16;
 const MONTH_NAMES = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const YEAR_LABEL_OFFSET = 12; // pushes the JAN label below the year label above it
 
-function measureLayout(year) {
-  const yearEl = document.querySelector('.year-view');
-  if (!yearEl) return null;
+// All offsets are relative to the top of .year-view, so they don't change on scroll.
+function measureLayout(range) {
+  const yearViewEl = document.querySelector('.year-view');
+  if (!yearViewEl) return null;
 
-  const yearRect = yearEl.getBoundingClientRect();
-  const calendarOffset = yearRect.top + window.scrollY;
-  const calendarHeight = yearRect.height;
+  const originTop = yearViewEl.getBoundingClientRect().top;
+  const years = [];
+  const months = [];
 
-  const monthData = Array.from({ length: 12 }, (_, m) => {
-    const monthEl = document.getElementById(`month-${year}-${m}`);
-    const gridEl = monthEl?.querySelector('.month-grid__days-wrapper');
-    if (!monthEl || !gridEl) return { offset: 0, gridOffset: 0, height: 0 };
+  for (let year = range.start; year <= range.end; year++) {
+    const yearEl = document.getElementById(`year-${year}`);
+    if (!yearEl) continue;
+    const yearRect = yearEl.getBoundingClientRect();
+    years.push({ year, offset: yearRect.top - originTop, height: yearRect.height });
 
-    const monthRect = monthEl.getBoundingClientRect();
-    const gridRect = gridEl.getBoundingClientRect();
-    return {
-      offset: monthRect.top + window.scrollY - calendarOffset,
-      gridOffset: gridRect.top + window.scrollY - calendarOffset,
-      height: monthRect.height,
-    };
-  });
+    for (let month = 0; month < 12; month++) {
+      const monthEl = document.getElementById(`month-${year}-${month}`);
+      const gridEl = monthEl?.querySelector('.month-grid__days-wrapper');
+      if (!monthEl || !gridEl) continue;
+      const monthRect = monthEl.getBoundingClientRect();
+      months.push({
+        year,
+        month,
+        offset: monthRect.top - originTop,
+        gridOffset: gridEl.getBoundingClientRect().top - originTop,
+        height: monthRect.height,
+      });
+    }
+  }
 
-  return { calendarOffset, calendarHeight, monthData };
+  return { years, months };
 }
 
-export default function Minimap({ year, isOpen, onClose }) {
+export default function Minimap({ range, isOpen, onClose }) {
   const { state: { blocks } } = useCalendar();
   const [vpY, setVpY] = useState(0);
   const [layout, setLayout] = useState(null);
@@ -45,8 +54,17 @@ export default function Minimap({ year, isOpen, onClose }) {
   const svgRef = useRef(null);
 
   useLayoutEffect(() => {
-    setLayout(measureLayout(year));
-  }, [year]);
+    setLayout(measureLayout(range));
+  }, [range]);
+
+  // Re-measure when the calendar reflows (resize, breakpoint changes, fonts)
+  useEffect(() => {
+    const yearViewEl = document.querySelector('.year-view');
+    if (!yearViewEl) return;
+    const ro = new ResizeObserver(() => setLayout(measureLayout(range)));
+    ro.observe(yearViewEl);
+    return () => ro.disconnect();
+  }, [range]);
 
   useLayoutEffect(() => {
     if (!svgRef.current || !layout) return;
@@ -58,65 +76,71 @@ export default function Minimap({ year, isOpen, onClose }) {
   }, [layout]);
 
   useEffect(() => {
-    const onResize = () => setLayout(measureLayout(year));
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, [year]);
-
-  useEffect(() => {
     const update = () => {
       const el = document.querySelector('.year-view');
       if (el) setVpY(-el.getBoundingClientRect().top);
     };
     update();
     window.addEventListener('scroll', update, { passive: true });
-    return () => window.removeEventListener('scroll', update);
-  }, []);
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [range]);
 
-  const handleClick = (e) => {
-    if (!layout || !svgRef.current) return;
-    const yearEl = document.querySelector('.year-view');
-    if (!yearEl) return;
-    const { top, height } = svgRef.current.getBoundingClientRect();
-    const fraction = (e.clientY - top) / height;
-    const calOff = yearEl.getBoundingClientRect().top + window.scrollY;
-    const targetY = calOff + fraction * layout.calendarHeight - window.innerHeight / 2;
-    window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
-  };
-
-  if (!layout) return <div className={`minimap${isOpen ? ' minimap--open' : ''}`} />;
-
-  const { calendarHeight, monthData } = layout;
-
-  const blockRects = blocks.flatMap(block => {
-    const rects = [];
-    const colorDef = COLORS.find(c => c.id === block.color) ?? COLORS[5];
-    for (let m = 0; m < 12; m++) {
-      const seg = getBlockSegmentForMonth(block, year, m);
-      if (!seg) continue;
-      const strips = getStripsForSegment(seg.segmentStart, seg.segmentEnd, year, m);
-      strips.forEach((strip, si) => {
-        const x = (strip.colStart / 7) * SVG_WIDTH;
-        const w = ((strip.colEnd - strip.colStart + 1) / 7) * SVG_WIDTH;
-        const y = monthData[m].gridOffset + strip.row * CELL_HEIGHT + BLOCK_TOP_MARGIN;
-        rects.push(
+  // Block rects in .year-view coordinates for every mounted month; the viewBox
+  // below decides which slice of them is visible.
+  const blockRects = useMemo(() => {
+    if (!layout) return [];
+    return blocks.flatMap(block => {
+      const colorDef = COLORS.find(c => c.id === block.color) ?? COLORS[5];
+      return layout.months.flatMap(md => {
+        const seg = getBlockSegmentForMonth(block, md.year, md.month);
+        if (!seg) return [];
+        return getStripsForSegment(seg.segmentStart, seg.segmentEnd, md.year, md.month).map((strip, si) => (
           <rect
-            key={`${block.id}-${m}-${si}`}
-            x={x} y={y} width={w} height={BLOCK_HEIGHT}
+            key={`${block.id}-${md.year}-${md.month}-${si}`}
+            x={(strip.colStart / 7) * SVG_WIDTH}
+            y={md.gridOffset + strip.row * CELL_HEIGHT + BLOCK_TOP_MARGIN}
+            width={((strip.colEnd - strip.colStart + 1) / 7) * SVG_WIDTH}
+            height={BLOCK_HEIGHT}
             fill={colorDef.bg}
             rx={3}
           />
-        );
+        ));
       });
-    }
-    return rects;
-  });
+    });
+  }, [blocks, layout]);
+
+  if (!layout || layout.years.length === 0) {
+    return <div className={`minimap${isOpen ? ' minimap--open' : ''}`} />;
+  }
+
+  // The map shows roughly one year of calendar (±6 months), centered on the viewport
+  const windowHeight = layout.years.reduce((sum, y) => sum + y.height, 0) / layout.years.length;
+  const winTop = vpY + window.innerHeight / 2 - windowHeight / 2;
+  const winBottom = winTop + windowHeight;
 
   const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 52;
   const minimapHeight = window.innerHeight - headerH - 24;
   const svgDisplayHeight = measuredSvgHeight ?? (minimapHeight - 16);
   const svgRx = 6 * SVG_WIDTH / SVG_DISPLAY_WIDTH;
-  const svgRy = 6 * calendarHeight / svgDisplayHeight;
+  const svgRy = 6 * windowHeight / svgDisplayHeight;
+  const labelTop = offset => svgBodyOffset + ((offset - winTop) / windowHeight) * svgDisplayHeight;
+  const inWindow = offset => offset >= winTop && offset <= winBottom - 12 * windowHeight / svgDisplayHeight;
+
+  const handleClick = (e) => {
+    const yearViewEl = document.querySelector('.year-view');
+    if (!yearViewEl || !svgRef.current) return;
+    const { top, height } = svgRef.current.getBoundingClientRect();
+    const targetOffset = winTop + ((e.clientY - top) / height) * windowHeight;
+    const yearViewDocTop = yearViewEl.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({
+      top: Math.max(0, yearViewDocTop + targetOffset - window.innerHeight / 2),
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <>
@@ -125,38 +149,47 @@ export default function Minimap({ year, isOpen, onClose }) {
       )}
       <div className={`minimap${isOpen ? ' minimap--open' : ''}`}>
         <div className="minimap__body">
-          {monthData.map((m, i) => (
+          {layout.years.filter(y => inWindow(y.offset)).map(y => (
             <span
-              key={i}
-              className="minimap__label"
-              style={{ top: svgBodyOffset + (m.offset / calendarHeight) * svgDisplayHeight }}
+              key={`year-${y.year}`}
+              className="minimap__label minimap__label--year"
+              style={{ top: labelTop(y.offset) }}
             >
-              {MONTH_NAMES[i]}
+              {y.year}
+            </span>
+          ))}
+          {layout.months.filter(m => inWindow(m.offset)).map(m => (
+            <span
+              key={`${m.year}-${m.month}`}
+              className="minimap__label"
+              style={{ top: labelTop(m.offset) + (m.month === 0 ? YEAR_LABEL_OFFSET : 0) }}
+            >
+              {MONTH_NAMES[m.month]}
             </span>
           ))}
           <svg
             ref={svgRef}
             className="minimap__svg"
-            viewBox={`0 0 ${SVG_WIDTH} ${calendarHeight}`}
+            viewBox={`0 ${winTop} ${SVG_WIDTH} ${windowHeight}`}
             preserveAspectRatio="none"
             onClick={handleClick}
           >
-            {/* Month separator lines */}
-            {monthData.map((m, i) => i > 0 && (
+            {/* Month separator lines; year boundaries are heavier */}
+            {layout.months.map((m, i) => i > 0 && (
               <line
-                key={i}
+                key={`${m.year}-${m.month}`}
                 x1={0} y1={m.offset} x2={SVG_WIDTH} y2={m.offset}
-                stroke="#e2e8f0" strokeWidth={4}
+                stroke={m.month === 0 ? '#94a3b8' : '#e2e8f0'}
+                strokeWidth={m.month === 0 ? 8 : 4}
               />
             ))}
 
-            {/* Blocks */}
             {blockRects}
 
-            {/* Viewport indicator */}
+            {/* Viewport indicator: pinned to the center of the map */}
             <rect
               x={0}
-              y={Math.max(0, vpY)}
+              y={vpY}
               width={SVG_WIDTH}
               height={window.innerHeight}
               fill="rgba(59,130,246,0.06)"

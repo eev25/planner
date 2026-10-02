@@ -206,7 +206,7 @@ function reducer(state, action) {
   }
 }
 
-export function CalendarProvider({ children, year }) {
+export function CalendarProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   // Persist blocks
@@ -215,7 +215,7 @@ export function CalendarProvider({ children, year }) {
   }, [state.blocks]);
 
   return (
-    <CalendarContext.Provider value={{ state, dispatch, year }}>
+    <CalendarContext.Provider value={{ state, dispatch }}>
       {children}
     </CalendarContext.Provider>
   );
