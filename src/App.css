@@ -2,10 +2,10 @@
   position: sticky;
   top: 0;
   z-index: 10;
-  background: #fff;
+  background: var(--surface);
   text-align: center;
   padding: 32px 24px 16px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--border);
   margin-bottom: 0;
   transition: padding 0.2s ease, box-shadow 0.2s ease;
 }
@@ -50,7 +50,7 @@
   border: none;
   cursor: pointer;
   font-size: 18px;
-  color: #64748b;
+  color: var(--text-muted);
   padding: 2px 6px;
   border-radius: 4px;
   line-height: 1;
@@ -60,8 +60,8 @@
 }
 
 .year-selector__btn:hover:not(:disabled) {
-  color: #0f172a;
-  background: #f1f5f9;
+  color: var(--text-strong);
+  background: var(--surface-muted);
 }
 
 .year-selector__btn:disabled {
@@ -72,7 +72,7 @@
 .year-selector__label {
   font-size: 32px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-strong);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
   min-width: 4ch;
@@ -81,7 +81,7 @@
 
 .app-hint {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-faint);
   margin: 0;
   overflow: hidden;
   max-height: 3em;
@@ -111,6 +111,37 @@
   top: 50%;
   transform: translateY(-50%);
 }
+
+/* Round icon buttons in the header: export, import, theme, mobile menu toggle */
+.header-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.header-icon-btn:hover:not(:disabled) {
+  background: var(--surface-muted);
+  border-color: var(--border-strong);
+}
+
+.header-icon-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.header-icon-btn__icon { display: block; }
+
+
+.header-icon-btn__label { display: none; }
 
 .minimap-toggle     { display: none; }
 .event-list-toggle  { display: none; }
@@ -164,19 +195,19 @@
     gap: 6px;
     padding: 6px 14px;
     border-radius: 20px;
-    border: 1.5px solid #e2e8f0;
-    background: #fff;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
     font-size: 13px;
     font-weight: 600;
-    color: #475569;
+    color: var(--text-secondary);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s;
   }
 
   .minimap-toggle:hover,
   .event-list-toggle:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: var(--surface-muted);
+    border-color: var(--border-strong);
   }
 
   .app-hint--desktop { display: none; }

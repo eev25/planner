@@ -197,7 +197,7 @@ export default function Minimap({ range, isOpen, onClose }) {
               <line
                 key={`${m.year}-${m.month}`}
                 x1={0} y1={m.offset} x2={SVG_WIDTH} y2={m.offset}
-                stroke={m.month === 0 ? '#94a3b8' : '#e2e8f0'}
+                style={{ stroke: m.month === 0 ? 'var(--minimap-year-line)' : 'var(--border)' }}
                 strokeWidth={m.month === 0 ? 8 : 4}
               />
             ))}

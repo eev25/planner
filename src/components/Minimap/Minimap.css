@@ -23,12 +23,12 @@
   display: block;
   cursor: pointer;
   border-radius: 6px;
-  border: 1px solid #e2e8f0;
-  background: #fff;
+  border: 1px solid var(--border);
+  background: var(--surface);
 }
 
 .minimap__svg:hover {
-  border-color: #cbd5e1;
+  border-color: var(--border-strong);
 }
 
 .minimap__label {
@@ -36,7 +36,7 @@
   left: 10px;
   font-size: 12px;
   font-weight: 700;
-  color: #94a3b8;
+  color: var(--text-faint);
   letter-spacing: 0.05em;
   line-height: 1;
   transform: translateY(5px); /* gap between the separator line and the label's top */
@@ -60,9 +60,9 @@
     z-index: 200;
     transform: translateX(-100%);
     transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #fff;
+    background: var(--surface);
     box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
-    border-right: 1px solid #e2e8f0;
+    border-right: 1px solid var(--border);
     padding: 0;
     display: flex;
     flex-direction: column;
@@ -86,7 +86,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--backdrop);
     z-index: 199;
   }
 }

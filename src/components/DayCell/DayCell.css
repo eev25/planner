@@ -1,22 +1,22 @@
 .day-cell {
   min-height: 84px;
   padding: 4px 6px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--border);
   box-sizing: border-box;
   position: relative;
   user-select: none;
   cursor: crosshair;
-  background: #fff;
+  background: var(--surface);
   transition: background 0.1s;
   touch-action: pan-y;
 }
 
 .day-cell:hover {
-  background: #f8fafc;
+  background: var(--surface-hover);
 }
 
 .day-cell--today {
-  background: #eff6ff;
+  background: var(--today-bg);
 }
 
 .day-cell--today .day-cell__number {
@@ -44,7 +44,7 @@
 .day-cell__number {
   font-size: 12px;
   font-weight: 500;
-  color: #64748b;
+  color: var(--text-muted);
   position: relative;
   z-index: 1;
   line-height: 22px;

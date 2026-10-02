@@ -7,6 +7,8 @@ import EventList from './components/EventList/EventList';
 import Minimap from './components/Minimap/Minimap';
 import DataTransfer from './components/DataTransfer/DataTransfer';
 import TodayButton from './components/TodayButton/TodayButton';
+import ThemeToggle from './components/ThemeToggle/ThemeToggle';
+import HeaderMenu from './components/HeaderMenu/HeaderMenu';
 import { measureSlimHeaderHeight, scrollToElement } from './utils/scrollUtils';
 import './App.css';
 
@@ -167,7 +169,10 @@ function CalendarApp() {
           >
             Events
           </button>
-          <DataTransfer />
+          <HeaderMenu>
+            <DataTransfer />
+            <ThemeToggle />
+          </HeaderMenu>
         </div>
         <p className="app-hint app-hint--desktop">Drag to create blocks &nbsp;·&nbsp; Drag blocks to move &nbsp;·&nbsp; Click to edit</p>
         <p className="app-hint app-hint--mobile">Drag to create &nbsp;·&nbsp; Tap to edit</p>

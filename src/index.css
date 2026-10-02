@@ -2,11 +2,60 @@
   box-sizing: border-box;
 }
 
+/* Light is the default; useTheme (and the inline script in index.html) sets
+   data-theme="dark" on <html> to switch. Block colors are intentionally not
+   themed: the pastel fills with dark text read fine on either surface. */
+:root {
+  color-scheme: light;
+  --page-bg: #f8fafc;
+  --surface: #fff;
+  --surface-hover: #f8fafc;
+  --surface-muted: #f1f5f9;
+  --today-bg: #eff6ff;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-strong: #0f172a;
+  --text: #334155;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+  --danger: #dc2626;
+  --danger-bg: #fef2f2;
+  --danger-bg-hover: #fee2e2;
+  --backdrop: rgba(15, 23, 42, 0.4);
+  --toast-bg: #0f172a;
+  --toast-text: #fff;
+  --minimap-year-line: #94a3b8;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page-bg: #0b1120;
+  --surface: #121a2b;
+  --surface-hover: #182238;
+  --surface-muted: #1e293b;
+  --today-bg: #172a4d;
+  --border: #263349;
+  --border-strong: #3a4a63;
+  --text-strong: #f1f5f9;
+  --text: #cbd5e1;
+  --text-secondary: #b3c0d1;
+  --text-muted: #94a3b8;
+  --text-faint: #6b7a90;
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.14);
+  --danger-bg-hover: rgba(248, 113, 113, 0.24);
+  --backdrop: rgba(0, 0, 0, 0.6);
+  --toast-bg: #e2e8f0;
+  --toast-text: #0f172a;
+  --minimap-year-line: #64748b;
+}
+
 :root {
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
-  color: #334155;
-  background: #f8fafc;
+  color: var(--text);
+  background: var(--page-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

@@ -1,0 +1,52 @@
+.header-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.header-menu__items {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-menu .header-menu__toggle { display: none; }
+
+@media (max-width: 768px) {
+  .header-menu .header-menu__toggle { display: inline-flex; }
+
+  .header-menu__items {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 50;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    min-width: 176px;
+    padding: 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  }
+
+  .header-menu__items--open { display: flex; }
+
+  /* Inside the dropdown the icon buttons become labelled rows. */
+  .header-menu__items .header-icon-btn {
+    width: auto;
+    height: auto;
+    padding: 9px 10px;
+    justify-content: flex-start;
+    gap: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+  }
+
+  .header-menu__items .header-icon-btn__label { display: inline; }
+}

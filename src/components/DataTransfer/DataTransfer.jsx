@@ -19,7 +19,7 @@ const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 function TrayIcon({ arrow }) {
   return (
     <svg
-      className="data-transfer__icon"
+      className="header-icon-btn__icon"
       viewBox="0 0 16 16"
       width="16"
       height="16"
@@ -108,21 +108,23 @@ export default function DataTransfer() {
   return (
     <>
       <button
-        className="data-transfer__btn"
+        className="header-icon-btn"
         onClick={handleExport}
         disabled={state.blocks.length === 0}
         aria-label="Export events"
         title="Export events"
       >
         <TrayIcon arrow="down" />
+        <span className="header-icon-btn__label">Export events</span>
       </button>
       <button
-        className="data-transfer__btn"
+        className="header-icon-btn"
         onClick={() => fileInputRef.current?.click()}
         aria-label="Import events"
         title="Import events"
       >
         <TrayIcon arrow="up" />
+        <span className="header-icon-btn__label">Import events</span>
       </button>
       <input
         ref={fileInputRef}

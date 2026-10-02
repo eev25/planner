@@ -18,7 +18,7 @@
 .year-view__sentinel--bottom { bottom: 0; }
 
 .year-section + .year-section {
-  border-top: 2px solid #e2e8f0;
+  border-top: 2px solid var(--border);
   margin-top: 8px;
   padding-top: 24px;
 }
@@ -26,7 +26,7 @@
 .year-section__heading {
   font-size: 28px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-strong);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   margin: 0 0 16px;
