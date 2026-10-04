@@ -96,10 +96,12 @@ export default function BlockPopover() {
           ))}
         </div>
         <div className="popover__actions">
-          <button className="popover__btn popover__btn--delete" onClick={() => {
-            dispatch({ type: 'BLOCK_DELETE', id: block.id });
-            dispatch({ type: 'POPOVER_CLOSE' });
-          }}>Delete</button>
+          <button
+            className="popover__btn popover__btn--delete"
+            onClick={() => dispatch({ type: 'BLOCKS_DELETE', ids: [block.id] })}
+          >
+            Delete
+          </button>
           <button className="popover__btn popover__btn--save" onClick={save}>Save</button>
         </div>
       </div>

@@ -13,7 +13,7 @@ export default function Block({
 }) {
   const { dispatch, state } = useCalendar();
   const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
-  const isSelected = state.selectedBlockId === block.id;
+  const isSelected = state.selectedBlockIds.includes(block.id);
 
   function onPointerDown(e) {
     if (e.button !== 0) return;

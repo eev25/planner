@@ -9,6 +9,7 @@ import DataTransfer from './components/DataTransfer/DataTransfer';
 import TodayButton from './components/TodayButton/TodayButton';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import HeaderMenu from './components/HeaderMenu/HeaderMenu';
+import UndoSnackbar from './components/UndoSnackbar/UndoSnackbar';
 import { measureSlimHeaderHeight, scrollToElement } from './utils/scrollUtils';
 import './App.css';
 
@@ -191,6 +192,7 @@ function CalendarApp() {
       </div>
       <TodayButton onClick={jumpToToday} />
       <BlockPopover />
+      <UndoSnackbar />
     </>
   );
 }

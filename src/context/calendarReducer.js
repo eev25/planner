@@ -3,7 +3,10 @@ import { DEFAULT_COLOR } from '../utils/colorPalette';
 
 export const initialState = {
   blocks: [],
-  selectedBlockId: null,
+  selectedBlockIds: [],
+  // The blocks removed by the most recent delete, for the Undo snackbar.
+  // A new delete replaces it, making the previous one final.
+  lastDeleted: null,
   dragState: {
     mode: 'idle',
     anchorDate: null,
@@ -164,43 +167,72 @@ export function reducer(state, action) {
         ),
       };
 
-    case 'SELECT_BLOCK':
+    // Plain click: select only this block, or clear it if it was the sole selection.
+    case 'SELECT_BLOCK': {
+      const { selectedBlockIds } = state;
+      const isOnlySelection = selectedBlockIds.length === 1 && selectedBlockIds[0] === action.id;
+      return { ...state, selectedBlockIds: isOnlySelection ? [] : [action.id] };
+    }
+
+    // Shift+click: add or remove this block, keeping the rest of the selection.
+    case 'TOGGLE_BLOCK_SELECTION':
       return {
         ...state,
-        selectedBlockId: state.selectedBlockId === action.id ? null : action.id,
+        selectedBlockIds: state.selectedBlockIds.includes(action.id)
+          ? state.selectedBlockIds.filter(id => id !== action.id)
+          : [...state.selectedBlockIds, action.id],
       };
 
-    case 'DESELECT_BLOCK':
-      return state.selectedBlockId === null ? state : { ...state, selectedBlockId: null };
+    case 'DESELECT_ALL':
+      return state.selectedBlockIds.length === 0 ? state : { ...state, selectedBlockIds: [] };
 
-    case 'BLOCK_DELETE':
+    case 'BLOCKS_DELETE': {
+      const ids = new Set(action.ids);
+      const deleted = state.blocks.filter(b => ids.has(b.id));
+      if (deleted.length === 0) return state;
       return {
         ...state,
-        blocks: state.blocks.filter(b => b.id !== action.id),
-        selectedBlockId: state.selectedBlockId === action.id ? null : state.selectedBlockId,
-        popover: state.popover.blockId === action.id ? initialState.popover : state.popover,
+        blocks: state.blocks.filter(b => !ids.has(b.id)),
+        selectedBlockIds: state.selectedBlockIds.filter(id => !ids.has(id)),
+        popover: ids.has(state.popover.blockId) ? initialState.popover : state.popover,
+        lastDeleted: { blocks: deleted },
       };
+    }
 
-    case 'BLOCKS_IMPORT':
+    case 'UNDO_DELETE': {
+      if (!state.lastDeleted) return state;
+      const existing = new Set(state.blocks.map(b => b.id));
+      const restored = state.lastDeleted.blocks.filter(b => !existing.has(b.id));
+      return { ...state, blocks: [...state.blocks, ...restored], lastDeleted: null };
+    }
+
+    case 'DISMISS_UNDO':
+      return state.lastDeleted === null ? state : { ...state, lastDeleted: null };
+
+    // An import rewrites the event set, so an earlier delete is no longer undoable.
+    case 'BLOCKS_IMPORT': {
+      const imported = new Set(action.blocks.map(b => b.id));
       return {
         ...state,
         blocks: action.blocks,
-        selectedBlockId: action.blocks.some(b => b.id === state.selectedBlockId) ? state.selectedBlockId : null,
+        selectedBlockIds: state.selectedBlockIds.filter(id => imported.has(id)),
         popover: { ...initialState.popover },
+        lastDeleted: null,
       };
+    }
 
     // Editing an existing block highlights it for as long as the popover is open.
     case 'POPOVER_OPEN':
       return {
         ...state,
-        selectedBlockId: action.blockId,
+        selectedBlockIds: [action.blockId],
         popover: { visible: true, blockId: action.blockId, anchorRect: action.anchorRect || null, clickPoint: action.clickPoint || null },
       };
 
     case 'POPOVER_CLOSE':
       return {
         ...state,
-        selectedBlockId: state.selectedBlockId === state.popover.blockId ? null : state.selectedBlockId,
+        selectedBlockIds: state.selectedBlockIds.filter(id => id !== state.popover.blockId),
         popover: { ...initialState.popover },
       };
 

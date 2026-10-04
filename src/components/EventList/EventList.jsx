@@ -1,40 +1,42 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
-import { COLORS } from '../../utils/colorPalette';
-import { fromISO, daysBetween } from '../../utils/dateUtils';
+import EventRow from './EventRow';
+import TrashIcon from './TrashIcon';
 import './EventList.css';
-
-function formatDate(iso, withYear = false) {
-  return fromISO(iso).toLocaleDateString('default', {
-    month: 'short',
-    day: 'numeric',
-    ...(withYear && { year: 'numeric' }),
-  });
-}
-
-function durationLabel(startISO, endISO) {
-  const days = daysBetween(startISO, endISO) + 1;
-  return days > 1 ? `${days} days` : null;
-}
 
 export default function EventList({ isOpen, onClose, ensureYear }) {
   const { state, dispatch } = useCalendar();
-  const { blocks, selectedBlockId } = state;
+  const { blocks, selectedBlockIds } = state;
+  // The one row whose swipe Delete button is showing, if any.
+  const [swipeOpenId, setSwipeOpenId] = useState(null);
 
   // Clear the highlight as soon as the user presses anywhere else. Presses on
-  // list items (which manage selection themselves), the highlighted block, or
-  // the edit popover keep it. Capture phase, because Block stops propagation.
+  // list rows (which manage selection themselves), the panel header (its
+  // delete button), a highlighted block, or the edit popover keep it.
+  // Capture phase, because Block stops propagation.
   useEffect(() => {
-    if (!selectedBlockId) return;
+    if (selectedBlockIds.length === 0) return;
     function onPointerDown(e) {
-      const keep = e.target.closest?.(
-        `.event-list__item, .popover, [data-block-id="${selectedBlockId}"]`
-      );
-      if (!keep) dispatch({ type: 'DESELECT_BLOCK' });
+      const blockEl = e.target.closest?.('[data-block-id]');
+      const keep = e.target.closest?.('.event-list__row, .event-list__header, .popover')
+        || selectedBlockIds.includes(blockEl?.dataset.blockId);
+      if (!keep) dispatch({ type: 'DESELECT_ALL' });
     }
     document.addEventListener('pointerdown', onPointerDown, true);
     return () => document.removeEventListener('pointerdown', onPointerDown, true);
-  }, [selectedBlockId, dispatch]);
+  }, [selectedBlockIds, dispatch]);
+
+  // Pressing anywhere outside the swiped-open row closes it.
+  useEffect(() => {
+    if (!swipeOpenId) return;
+    function onPointerDown(e) {
+      if (e.target.closest?.('.event-list__row')?.dataset.eventId !== swipeOpenId) {
+        setSwipeOpenId(null);
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [swipeOpenId]);
 
   // Group by start year, then start month. A block that crosses a year boundary
   // is listed once, under the year it starts in.
@@ -59,7 +61,11 @@ export default function EventList({ isOpen, onClose, ensureYear }) {
     monthGroup.events.push(block);
   }
 
-  function handleSelect(block) {
+  function handleSelect(block, e) {
+    if (e.shiftKey) {
+      dispatch({ type: 'TOGGLE_BLOCK_SELECTION', id: block.id });
+      return;
+    }
     dispatch({ type: 'SELECT_BLOCK', id: block.id });
     ensureYear(Number(block.startDate.slice(0, 4)), () => {
       requestAnimationFrame(() => {
@@ -70,6 +76,13 @@ export default function EventList({ isOpen, onClose, ensureYear }) {
     if (onClose) onClose();
   }
 
+  function deleteEvents(ids) {
+    dispatch({ type: 'BLOCKS_DELETE', ids });
+  }
+
+  const selectedCount = selectedBlockIds.length;
+  const deleteLabel = `Delete ${selectedCount} selected event${selectedCount === 1 ? '' : 's'}`;
+
   return (
     <>
       {isOpen && (
@@ -78,16 +91,30 @@ export default function EventList({ isOpen, onClose, ensureYear }) {
       <aside className={`event-list${isOpen ? ' event-list--open' : ''}`}>
       <div className="event-list__header">
         <h2 className="event-list__title">Events</h2>
-        {blocks.length > 0 && (
+        {selectedCount > 0 ? (
+          <span className="event-list__selection">{selectedCount} selected</span>
+        ) : blocks.length > 0 && (
           <span className="event-list__count">{blocks.length}</span>
         )}
-        <button
-          className="event-list__close"
-          onClick={onClose}
-          aria-label="Close events panel"
-        >
-          ✕
-        </button>
+        <div className="event-list__header-actions">
+          {selectedCount > 0 && (
+            <button
+              className="event-list__delete"
+              onClick={() => deleteEvents(selectedBlockIds)}
+              aria-label={deleteLabel}
+              title={deleteLabel}
+            >
+              <TrashIcon />
+            </button>
+          )}
+          <button
+            className="event-list__close"
+            onClick={onClose}
+            aria-label="Close events panel"
+          >
+            ✕
+          </button>
+        </div>
       </div>
       {years.length === 0 ? (
         <p className="event-list__empty">No events yet. Drag on the calendar to create one.</p>
@@ -100,34 +127,17 @@ export default function EventList({ isOpen, onClose, ensureYear }) {
             <div key={month} className="event-list__group">
               <h4 className="event-list__month">{name}</h4>
               <ul className="event-list__items">
-                {events.map(block => {
-                  const colorDef = COLORS.find(c => c.id === block.color) || COLORS[5];
-                  const duration = durationLabel(block.startDate, block.endDate);
-                  const isSelected = block.id === selectedBlockId;
-                  const crossesYear = block.startDate.slice(0, 4) !== block.endDate.slice(0, 4);
-                  return (
-                    <li
-                      key={block.id}
-                      className={`event-list__item${isSelected ? ' event-list__item--selected' : ''}`}
-                      onClick={() => handleSelect(block)}
-                    >
-                      <span
-                        className="event-list__dot"
-                        style={{ '--dot-color': colorDef.bg }}
-                      />
-                      <div className="event-list__info">
-                        <span className="event-list__label">
-                          {block.label || <em className="event-list__unlabeled">Unlabeled</em>}
-                        </span>
-                        <span className="event-list__dates">
-                          {formatDate(block.startDate, crossesYear)}
-                          {block.startDate !== block.endDate && ` – ${formatDate(block.endDate, crossesYear)}`}
-                          {duration && <span className="event-list__duration">{duration}</span>}
-                        </span>
-                      </div>
-                    </li>
-                  );
-                })}
+                {events.map(block => (
+                  <EventRow
+                    key={block.id}
+                    block={block}
+                    isSelected={selectedBlockIds.includes(block.id)}
+                    isSwipeOpen={block.id === swipeOpenId}
+                    onSwipeOpenChange={setSwipeOpenId}
+                    onSelect={handleSelect}
+                    onDelete={id => deleteEvents([id])}
+                  />
+                ))}
               </ul>
             </div>
               ))}

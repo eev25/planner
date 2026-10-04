@@ -6,17 +6,56 @@
   align-self: flex-start;
   height: calc(100vh - var(--header-height, 52px));
   overflow-y: auto;
-  padding: 20px 16px;
+  padding: 0 16px 20px; /* the sticky header supplies the top padding */
   background: var(--surface);
+  --panel-header-height: 56px;
   border-left: 1px solid var(--border);
   scrollbar-width: thin;
 }
 
 .event-list__header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  height: var(--panel-header-height);
+  padding: 20px 0 8px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 20px; /* at least the year heading's mask height, or the mask clips the title */
+  background: var(--surface);
+}
+
+.event-list__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.event-list__selection {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.event-list__delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: none;
+  color: var(--danger);
+  cursor: pointer;
+}
+
+.event-list__delete:hover {
+  background: var(--danger-bg);
 }
 
 .event-list__title {
@@ -58,7 +97,7 @@
 
 .event-list__year {
   position: sticky;
-  top: 0;
+  top: var(--panel-header-height); /* pins just under the sticky panel header */
   z-index: 1;
   margin: 0;
   padding: 6px 0;
@@ -68,18 +107,6 @@
   font-weight: 800;
   color: var(--text-strong);
   font-variant-numeric: tabular-nums;
-}
-
-/* Sticky pins at the panel's padding edge; this masks the strip above it so
-   scrolled content doesn't show through. */
-.event-list__year::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -20px;
-  height: 20px;
-  background: var(--surface);
 }
 
 .event-list__month {
@@ -100,15 +127,52 @@
   gap: 4px;
 }
 
+.event-list__row {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .event-list__item {
+  position: relative; /* above the swipe Delete button */
   display: flex;
   align-items: flex-start;
   gap: 10px;
   padding: 8px 10px;
   border-radius: 8px;
+  background: var(--surface);
   cursor: pointer;
-  transition: background 0.1s;
+  transition: background 0.1s, transform 0.18s ease-out;
   user-select: none;
+  touch-action: pan-y; /* horizontal touch moves are ours, for swipe-to-delete */
+}
+
+.event-list__item--dragging {
+  transition: background 0.1s;
+}
+
+.event-list__swipe-delete {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 8px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.event-list__swipe-delete--armed {
+  background: #b91c1c;
 }
 
 .event-list__item:hover {
@@ -178,7 +242,6 @@
   padding: 4px 6px;
   border-radius: 4px;
   line-height: 1;
-  margin-left: auto;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;

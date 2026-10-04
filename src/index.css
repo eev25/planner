@@ -25,6 +25,8 @@
   --backdrop: rgba(15, 23, 42, 0.4);
   --toast-bg: #0f172a;
   --toast-text: #fff;
+  --toast-action: #93c5fd;
+  --toast-action-hover: rgba(255, 255, 255, 0.1);
   --minimap-year-line: #94a3b8;
 }
 
@@ -48,6 +50,8 @@
   --backdrop: rgba(0, 0, 0, 0.6);
   --toast-bg: #e2e8f0;
   --toast-text: #0f172a;
+  --toast-action: #1d4ed8;
+  --toast-action-hover: rgba(15, 23, 42, 0.08);
   --minimap-year-line: #64748b;
 }
 
