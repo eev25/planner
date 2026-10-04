@@ -1,0 +1,210 @@
+import { minDate, maxDate, daysBetween, addDays } from '../utils/dateUtils';
+import { DEFAULT_COLOR } from '../utils/colorPalette';
+
+export const initialState = {
+  blocks: [],
+  selectedBlockId: null,
+  dragState: {
+    mode: 'idle',
+    anchorDate: null,
+    currentDate: null,
+    blockId: null,
+    offsetDays: 0,
+    resizeEdge: null,
+    previewStart: null,
+    previewEnd: null,
+  },
+  popover: {
+    visible: false,
+    blockId: null,
+    anchorRect: null,
+  },
+};
+
+export function reducer(state, action) {
+  switch (action.type) {
+    case 'DRAG_START_CREATE':
+      return {
+        ...state,
+        dragState: {
+          mode: 'creating',
+          anchorDate: action.anchorDate,
+          currentDate: action.anchorDate,
+          blockId: null,
+          offsetDays: 0,
+          previewStart: action.anchorDate,
+          previewEnd: action.anchorDate,
+        },
+      };
+
+    case 'DRAG_START_MOVE': {
+      const block = state.blocks.find(b => b.id === action.blockId);
+      if (!block) return state;
+      return {
+        ...state,
+        dragState: {
+          mode: 'moving',
+          anchorDate: null,
+          currentDate: action.currentDate,
+          blockId: action.blockId,
+          offsetDays: action.offsetDays,
+          resizeEdge: null,
+          previewStart: block.startDate,
+          previewEnd: block.endDate,
+        },
+      };
+    }
+
+    case 'DRAG_START_RESIZE': {
+      const block = state.blocks.find(b => b.id === action.blockId);
+      if (!block) return state;
+      return {
+        ...state,
+        dragState: {
+          mode: 'resizing',
+          anchorDate: null,
+          currentDate: action.currentDate,
+          blockId: action.blockId,
+          offsetDays: 0,
+          resizeEdge: action.resizeEdge,
+          previewStart: block.startDate,
+          previewEnd: block.endDate,
+        },
+      };
+    }
+
+    case 'DRAG_UPDATE': {
+      const { dragState } = state;
+      if (dragState.mode === 'idle') return state;
+
+      if (dragState.mode === 'creating') {
+        const previewStart = minDate(dragState.anchorDate, action.currentDate);
+        const previewEnd   = maxDate(dragState.anchorDate, action.currentDate);
+        return {
+          ...state,
+          dragState: { ...dragState, currentDate: action.currentDate, previewStart, previewEnd },
+        };
+      }
+
+      if (dragState.mode === 'moving') {
+        const block = state.blocks.find(b => b.id === dragState.blockId);
+        if (!block) return state;
+        const duration     = daysBetween(block.startDate, block.endDate);
+        const previewStart = addDays(action.currentDate, -dragState.offsetDays);
+        const previewEnd   = addDays(previewStart, duration);
+        return {
+          ...state,
+          dragState: { ...dragState, currentDate: action.currentDate, previewStart, previewEnd },
+        };
+      }
+
+      if (dragState.mode === 'resizing') {
+        const block = state.blocks.find(b => b.id === dragState.blockId);
+        if (!block) return state;
+        if (dragState.resizeEdge === 'start') {
+          const previewStart = minDate(action.currentDate, block.endDate);
+          return { ...state, dragState: { ...dragState, currentDate: action.currentDate, previewStart } };
+        } else {
+          const previewEnd = maxDate(action.currentDate, block.startDate);
+          return { ...state, dragState: { ...dragState, currentDate: action.currentDate, previewEnd } };
+        }
+      }
+
+      return state;
+    }
+
+    case 'DRAG_COMMIT_CREATE': {
+      const { dragState } = state;
+      if (dragState.mode !== 'creating') return state;
+      const newBlock = {
+        id: crypto.randomUUID(),
+        startDate: dragState.previewStart,
+        endDate: dragState.previewEnd,
+        color: DEFAULT_COLOR.id,
+        label: '',
+      };
+      return {
+        ...state,
+        blocks: [...state.blocks, newBlock],
+        dragState: { ...initialState.dragState },
+        popover: { visible: true, blockId: newBlock.id, anchorRect: action.anchorRect || null },
+      };
+    }
+
+    case 'DRAG_COMMIT_MOVE': {
+      const { dragState } = state;
+      if (dragState.mode !== 'moving') return state;
+      const blocks = state.blocks.map(b =>
+        b.id === dragState.blockId
+          ? { ...b, startDate: dragState.previewStart, endDate: dragState.previewEnd }
+          : b
+      );
+      return { ...state, blocks, dragState: { ...initialState.dragState } };
+    }
+
+    case 'DRAG_COMMIT_RESIZE': {
+      const { dragState } = state;
+      if (dragState.mode !== 'resizing') return state;
+      const blocks = state.blocks.map(b =>
+        b.id === dragState.blockId
+          ? { ...b, startDate: dragState.previewStart, endDate: dragState.previewEnd }
+          : b
+      );
+      return { ...state, blocks, dragState: { ...initialState.dragState } };
+    }
+
+    case 'DRAG_CANCEL':
+      return { ...state, dragState: { ...initialState.dragState } };
+
+    case 'BLOCK_UPDATE':
+      return {
+        ...state,
+        blocks: state.blocks.map(b =>
+          b.id === action.id ? { ...b, label: action.label, color: action.color } : b
+        ),
+      };
+
+    case 'SELECT_BLOCK':
+      return {
+        ...state,
+        selectedBlockId: state.selectedBlockId === action.id ? null : action.id,
+      };
+
+    case 'DESELECT_BLOCK':
+      return state.selectedBlockId === null ? state : { ...state, selectedBlockId: null };
+
+    case 'BLOCK_DELETE':
+      return {
+        ...state,
+        blocks: state.blocks.filter(b => b.id !== action.id),
+        selectedBlockId: state.selectedBlockId === action.id ? null : state.selectedBlockId,
+        popover: state.popover.blockId === action.id ? initialState.popover : state.popover,
+      };
+
+    case 'BLOCKS_IMPORT':
+      return {
+        ...state,
+        blocks: action.blocks,
+        selectedBlockId: action.blocks.some(b => b.id === state.selectedBlockId) ? state.selectedBlockId : null,
+        popover: { ...initialState.popover },
+      };
+
+    // Editing an existing block highlights it for as long as the popover is open.
+    case 'POPOVER_OPEN':
+      return {
+        ...state,
+        selectedBlockId: action.blockId,
+        popover: { visible: true, blockId: action.blockId, anchorRect: action.anchorRect || null, clickPoint: action.clickPoint || null },
+      };
+
+    case 'POPOVER_CLOSE':
+      return {
+        ...state,
+        selectedBlockId: state.selectedBlockId === state.popover.blockId ? null : state.selectedBlockId,
+        popover: { ...initialState.popover },
+      };
+
+    default:
+      return state;
+  }
+}
