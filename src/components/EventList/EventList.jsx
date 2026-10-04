@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useCalendar } from '../../context/CalendarContext';
 import { COLORS } from '../../utils/colorPalette';
 import { fromISO, daysBetween } from '../../utils/dateUtils';
@@ -19,6 +20,21 @@ function durationLabel(startISO, endISO) {
 export default function EventList({ isOpen, onClose, ensureYear }) {
   const { state, dispatch } = useCalendar();
   const { blocks, selectedBlockId } = state;
+
+  // Clear the highlight as soon as the user presses anywhere else. Presses on
+  // list items (which manage selection themselves), the highlighted block, or
+  // the edit popover keep it. Capture phase, because Block stops propagation.
+  useEffect(() => {
+    if (!selectedBlockId) return;
+    function onPointerDown(e) {
+      const keep = e.target.closest?.(
+        `.event-list__item, .popover, [data-block-id="${selectedBlockId}"]`
+      );
+      if (!keep) dispatch({ type: 'DESELECT_BLOCK' });
+    }
+    document.addEventListener('pointerdown', onPointerDown, true);
+    return () => document.removeEventListener('pointerdown', onPointerDown, true);
+  }, [selectedBlockId, dispatch]);
 
   // Group by start year, then start month. A block that crosses a year boundary
   // is listed once, under the year it starts in.

@@ -184,6 +184,9 @@ function reducer(state, action) {
         selectedBlockId: state.selectedBlockId === action.id ? null : action.id,
       };
 
+    case 'DESELECT_BLOCK':
+      return state.selectedBlockId === null ? state : { ...state, selectedBlockId: null };
+
     case 'BLOCK_DELETE':
       return {
         ...state,
