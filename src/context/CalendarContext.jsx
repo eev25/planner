@@ -203,14 +203,20 @@ function reducer(state, action) {
         popover: { ...initialState.popover },
       };
 
+    // Editing an existing block highlights it for as long as the popover is open.
     case 'POPOVER_OPEN':
       return {
         ...state,
+        selectedBlockId: action.blockId,
         popover: { visible: true, blockId: action.blockId, anchorRect: action.anchorRect || null, clickPoint: action.clickPoint || null },
       };
 
     case 'POPOVER_CLOSE':
-      return { ...state, popover: { ...initialState.popover } };
+      return {
+        ...state,
+        selectedBlockId: state.selectedBlockId === state.popover.blockId ? null : state.selectedBlockId,
+        popover: { ...initialState.popover },
+      };
 
     default:
       return state;
